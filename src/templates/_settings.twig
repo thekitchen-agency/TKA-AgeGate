@@ -1,0 +1,37 @@
+{# @var plugin \thekitchenagency\craftagegate\AgeGate #}
+{# @var settings \thekitchenagency\craftagegate\models\Settings #}
+
+{% import '_includes/forms.twig' as forms %}
+
+{{ forms.textField({
+    first: true,
+    label: 'Minimum Age Allowed',
+    name: 'minimumAgeAllowed',
+    value: settings.minimumAgeAllowed
+}) }}
+
+{{ forms.textField({
+    label: 'Title of Age Gate',
+    name: 'agegateTitle',
+    value: settings.agegateTitle
+}) }}
+
+{{ forms.textField({
+    label: 'Content of agegate',
+    name: 'agegateContent',
+    value: settings.agegateContent
+}) }}
+
+{{ forms.textField({
+    label: 'Agree Button',
+    name: 'agegateAgreeButton',
+    value: settings.agegateAgreeButton
+}) }}
+
+{{ forms.textField({
+    label: 'Decline Button',
+    name: 'agegateDeclineButton',
+    value: settings.agegateDeclineButton
+}) }}
+
+

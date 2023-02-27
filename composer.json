@@ -1,0 +1,33 @@
+{
+    "name": "thekitchen-agency/craft-agegate",
+    "description": "A description",
+    "type": "craft-plugin",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.0.2",
+        "craftcms/cms": "^4.3.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "thekitchenagency\\craftagegate\\": "src/"
+        }
+    },
+    "extra": {
+        "handle": "craft-agegate",
+        "name": "Agegate",
+        "developer": "thekitchen.agency",
+        "documentationUrl": "",
+        "class": "thekitchenagency\\craftagegate\\AgeGate"
+    },
+    "config": {
+        "sort-packages": true,
+        "platform": {
+            "php": "8.0.2"
+        },
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true,
+            "craftcms/plugin-installer": true
+        }
+    }
+}
+
