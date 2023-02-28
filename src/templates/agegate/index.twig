@@ -1,5 +1,7 @@
 {% macro convertToLink(entry) %}
+    {% if entry %}
     <a class="inline-link" href="{{ entry.url }}">{{ entry.title }}</a>
+    {%  endif %}
 {% endmacro %}
 
 {% set minAge = settings.minimumAgeAllowed %}

@@ -38,34 +38,20 @@ class AgeGate extends Plugin {
 
 	public function init() {
 		parent::init();
-		$this->attachEventHandlers();
+		// $this->attachEventHandlers();
 
 		if ( Craft::$app->getRequest()->getIsSiteRequest() ) {
 			Craft::$app->getView()->registerAssetBundle( AgeGateAssets::class );
 
 			$url = Craft::$app->assetManager->getPublishedUrl( '@thekitchenagency/craftagegate/resources/', true );
-			Craft::$app->getView()->registerJsVar( 'agegateresources', $url );
+			// Craft::$app->getView()->registerJsVar( 'agegateresources', $url );
 			Craft::$app->getView()->registerJsVar( 'agegatesettings', $this->getSettings() );
 		}
 
 		Craft::$app->onInit( function () {
-			// $this->attachEventHandlers();
+			$this->attachEventHandlers();
 			self::$plugin   = $this;
 			self::$settings = $this->getSettings();
-
-			$entry[] = Craft::$app->getEntries()->getEntryById(self::$settings->pagePrivacyPolicy[0]);
-			$entry[] = Craft::$app->getEntries()->getEntryById(self::$settings->pageCookiePolicy[0]);
-
-			$matchingSite = false;
-			foreach ( $entry as $singleEntry ) {
-				if ( Craft::$app->getRequest()->getSegment(1) === $singleEntry->slug ) {
-					$matchingSite = true;
-				}
-			}
-
-			if ( self::$settings->isAgeGateEnabled && !$matchingSite) {
-				$this->ageGate->renderAgeGate();
-			}
 
 		} );
 
@@ -78,6 +64,8 @@ class AgeGate extends Plugin {
 	protected function settingsHtml(): ?string {
 		$pagePrivacy = [];
 		$pageCookie  = [];
+		$redirectedPage = [];
+
 		if ( self::$settings->pagePrivacyPolicy ) {
 			foreach ( self::$settings->pagePrivacyPolicy as $entryID ) {
 				$pagePrivacy[] = Craft::$app->elements->getElementById( $entryID );
@@ -90,10 +78,17 @@ class AgeGate extends Plugin {
 			}
 		}
 
+		if ( self::$settings->pageRedirection ) {
+			foreach ( self::$settings->pageCookiePolicy as $entryID ) {
+				$redirectedPage[] = Craft::$app->elements->getElementById( $entryID );
+			}
+		}
+
 		return Craft::$app->view->renderTemplate( 'craft-agegate/_settings.twig', [
 			'plugin'      => $this,
 			'pagePrivacy' => $pagePrivacy,
 			'pageCookie'  => $pageCookie,
+			'pageRedirected' => $redirectedPage,
 			'settings'    => $this->getSettings(),
 		] );
 	}

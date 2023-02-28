@@ -23,12 +23,19 @@
     value: settings.cookieName
 }) }}
 
+{{ forms.textField({
+    label: 'Redirect URL',
+    instructions: 'URL to redirect to if user is under the minimum age',
+    name: 'declineUrl',
+    value: settings.declineUrl
+}) }}
+
 {{ forms.selectField({
     label: "AgeGate Type"|t,
     instructions: "Set the type of user action prompted by the banner"|t,
     id: 'type',
     name: 'displayType',
-    options: { 'modal': "Modal"|t, 'full-page': "Full Page"|t},
+    options: { 'modal': "Modal"|t, 'full-page': "Full Page"|t, 'redirect': "Redirect"|t },
     value: settings.displayType
 }) }}
 
@@ -69,4 +76,11 @@
     name: 'pageCookiePolicy',
     id: 'pageCookiePolicy',
     elements: pageCookie
+}) }}
+
+{{ forms.elementSelectField({
+    elementType: 'craft\\elements\\Entry',
+    label: 'Age Gate Page',
+    name: 'redirectedPage',
+    elements: pageRedirected
 }) }}

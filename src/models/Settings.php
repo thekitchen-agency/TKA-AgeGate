@@ -24,6 +24,7 @@ class Settings extends Model {
 	public $declineUrl = 'https://www.google.com';
 	public $pagePrivacyPolicy = [];
 	public $pageCookiePolicy = [];
+	public $pageRedirection = [];
 
 	public $agegateAgreeButton = 'Enter';
 	public $agegateDeclineButton = 'Leave';
