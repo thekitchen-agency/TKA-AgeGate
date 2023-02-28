@@ -1,6 +1,22 @@
-{% extends 'cage/age-verification/_layout' %}
+{% macro convertToLink(entry) %}
+    <a class="inline-link" href="{{ entry.url }}">{{ entry.title }}</a>
+{% endmacro %}
 
-{% from "cage/age-verification/_macro" import monthNameFromNumber %}
+{% set minAge = settings.minimumAgeAllowed %}
+{% set agbPage = _self.convertToLink(craft.entries().id(settings.pagePrivacyPolicy).one()) %}
+{% set cookiesPage = _self.convertToLink(craft.entries().id(settings.pageCookiePolicy).one()) %}
+
+<article class="box" id="agegate">
+    <div class="wrap">
+        <h3>{{ settings.agegateTitle }}</h3>
+        <p>{{ settings.agegateContent | replace('[Cookies]', agbPage) | replace('[Datenschutz]', cookiesPage) | raw }}</p>
+        <a href="#" class="button solid confirm-ag">{{ settings.agegateAgreeButton|replace('[minAge]', minAge) }}</a>
+        <a href="#" class="button outline decline-ag">{{ settings.agegateDeclineButton|replace('[minAge]', minAge) }}</a>
+    </div>
+</article>
+<div class="ag-verifyOverlay"></div>
+{#
+{% extends 'cage/age-verification/_layout' %}
 
 {% block itemContent %}
     {% if settings.logo|length %}
@@ -200,3 +216,4 @@
         })();
     </script>
 {% endblock %}
+#}

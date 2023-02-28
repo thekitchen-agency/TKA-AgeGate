@@ -1,0 +1,26 @@
+#agegate {
+    z-index: 999;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    inset: 0;
+}
+
+#agegate .wrap {
+    background: rgba(255,255,255,0.4);
+    width: 60vw;
+    aspect-ratio: 16 / 10;
+}
+
+.ag-verifyOverlay {
+    position: fixed;
+    background: rgba(0,0,0,0.8);
+    z-index: 99;
+    display: block;
+    inset: 0;
+}
+
+body.agegate-active {
+    overflow: hidden;
+}

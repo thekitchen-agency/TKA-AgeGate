@@ -3,11 +3,33 @@
 
 {% import '_includes/forms.twig' as forms %}
 
+{{ forms.lightswitchField({
+    label: "Enabled"|t,
+    id: 'isAgeGateEnabled',
+    name: 'isAgeGateEnabled',
+    instructions: "General Switch"|t,
+    on: settings.isAgeGateEnabled
+}) }}
+
 {{ forms.textField({
-    first: true,
     label: 'Minimum Age Allowed',
     name: 'minimumAgeAllowed',
     value: settings.minimumAgeAllowed
+}) }}
+
+{{ forms.textField({
+    label: 'Cookie Name',
+    name: 'cookieName',
+    value: settings.cookieName
+}) }}
+
+{{ forms.selectField({
+    label: "AgeGate Type"|t,
+    instructions: "Set the type of user action prompted by the banner"|t,
+    id: 'type',
+    name: 'displayType',
+    options: { 'modal': "Modal"|t, 'full-page': "Full Page"|t},
+    value: settings.displayType
 }) }}
 
 {{ forms.textField({
@@ -34,4 +56,17 @@
     value: settings.agegateDeclineButton
 }) }}
 
+{{ forms.elementSelectField({
+    elementType: 'craft\\elements\\Entry',
+    label: 'Select Privacy Policy Page',
+    name: 'pagePrivacyPolicy',
+    elements: pagePrivacy
+}) }}
 
+{{ forms.elementSelectField({
+    elementType: 'craft\\elements\\Entry',
+    label: 'Select Cookie Policy Page',
+    name: 'pageCookiePolicy',
+    id: 'pageCookiePolicy',
+    elements: pageCookie
+}) }}

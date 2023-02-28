@@ -11,6 +11,7 @@ use craft\base\Model;
  */
 class Settings extends Model {
 	public $pluginName = 'AgeGate';
+	public $displayType = 'modal';
 	public $isAgeGateEnabled = true;
 	public $minimumAgeAllowed = 10;
 	public $agegateTitle = 'Age Verification';
@@ -19,6 +20,10 @@ class Settings extends Model {
 	public $monthPlaceHolder = 'MM';
 	public $yearPlaceHolder = 'YYYY';
 	public $ageVerificationPath= 'agegate';
+	public $cookieName = 'tester';
+	public $declineUrl = 'https://www.google.com';
+	public $pagePrivacyPolicy = [];
+	public $pageCookiePolicy = [];
 
 	public $agegateAgreeButton = 'Enter';
 	public $agegateDeclineButton = 'Leave';
