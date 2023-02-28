@@ -22,13 +22,11 @@ class AgeGateService extends Component
 			return false;
 		}
 
-		if ( isset($_COOKIE[$settings->cookieName]) && !empty($_COOKIE[$settings->cookieName]) ) {
-			return false;
-		} else {
-			Craft::$app->view->setTemplateMode(Craft::$app->view::TEMPLATE_MODE_SITE);
+		if ( !isset($_COOKIE[$settings->cookieName]) && empty($_COOKIE[$settings->cookieName]) ) {
 			$html = Craft::$app->view->renderTemplate('_agegate/index.twig', ['settings' => $settings], View::TEMPLATE_MODE_SITE);
 			echo $html;
 		}
+
 		return true;
 	}
 }
