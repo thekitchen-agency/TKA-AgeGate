@@ -8,6 +8,10 @@
     text-align: center;
 }
 
+#agegate a.button{
+    margin-right: 16px;
+}
+
 #agegate h1,
 #agegate h2,
 #agegate h3,
@@ -50,8 +54,4 @@
     z-index: 99;
     display: block;
     inset: 0;
-}
-
-body.agegate-active div.inner-container {
-    min-height: 20vh;
 }
