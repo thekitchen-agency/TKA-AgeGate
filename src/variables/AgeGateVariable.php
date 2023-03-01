@@ -9,6 +9,7 @@ use Craft;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
+use verbb\formie\options\Age;
 use yii\base\Exception;
 use yii\log\Logger;
 
@@ -22,8 +23,9 @@ class AgeGateVariable
 	 */
 	public function renderAGElement()
 	{
-		Craft::getLogger()->log('variable' . ' variable render-element', 'craft-agegate');
-		// AgeGate::$plugin->ageGate->getRenderAgeGate();
+		Agegate::$plugin->ageGateService->getRenderAgeGate();
+		// var_dump(Agegate::$plugin->ageGateService);
+		// return AgeGate::$plugin->ageGateService->getRenderAgeGate();
 		// return 'test';
 		// return Craft::$app->agegate->renderAgeGate();
 		// return ;

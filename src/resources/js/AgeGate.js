@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
             setCookie();
             document.body.classList.remove('agegate-active');
             document.getElementById('agegate').remove();
-            document.querySelector('.ag-verifyOverlay').remove();
+            // document.querySelector('.ag-verifyOverlay').remove();
+            window.location = window.originalSrcUrl;
         });
     }
 });

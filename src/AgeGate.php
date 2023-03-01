@@ -32,14 +32,6 @@ class AgeGate extends Plugin {
 	public string $schemaVersion = '1.0.2';
 	public bool $hasCpSettings = true;
 
-	/*public static function config(): array {
-		return [
-			'components' => [
-				'ageGate' => AgeGateService::class,
-			],
-		];
-	}*/
-
 	public function init() {
 		parent::init();
 		// $this->attachEventHandlers();
@@ -54,7 +46,6 @@ class AgeGate extends Plugin {
 		}
 
 		Craft::$app->onInit( function () {
-			$this->attachEventHandlers();
 			self::$plugin   = $this;
 			self::$settings = $this->getSettings();
 
@@ -77,22 +68,24 @@ class AgeGate extends Plugin {
 				}
 			}
 
-			if(Craft::$app->request->getIsCpRequest()
-			   || Craft::$app->request->getIsConsoleRequest()
-			   || Craft::$app->request->getIsLivePreview()
-			   || Craft::$app->request->getIsPreview()
-			   || (Craft::$app->request->hasMethod("getIsAjax") && Craft::$app->request->getIsAjax())
-			   || (Craft::$app->request->hasMethod("getIsLivePreview") && (Craft::$app->request->getIsLivePreview() && CookieConsentBanner::$plugin->getSettings()->disable_in_live_preview))) {
-				return false;
-			} else {
+			if(Craft::$app->request->getIsSiteRequest()) {
 				if ( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'modal' ) {
 					$this->ageGateService->renderAgeGate();
 				} else if( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'redirect' && Craft::$app->getRequest()->getSegment(1) != 'agegate' ) {
-					// Craft::$app->getResponse()->redirect(UrlHelper::siteUrl('agegate'))->send();
+					$originalUrl = Craft::$app->getRequest()->getFullUri();
+					Craft::$app->getSession()->set('originalSrcUrl', $originalUrl);
+
+					if ( !isset($_COOKIE[self::$settings->cookieName]) || empty($_COOKIE[self::$settings->cookieName]) ) {
+						Craft::$app->getResponse()->redirect(UrlHelper::siteUrl('agegate'))->send();
+					}
+
+				} else if( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'redirect' && Craft::$app->getRequest()->getSegment(1) == 'agegate' ) {
+					Craft::$app->getView()->registerJsVar( 'originalSrcUrl', Craft::$app->getSession()->get('originalSrcUrl') );
 				}
 			}
 		} );
 
+		$this->attachEventHandlers();
 	}
 
 	protected function createSettingsModel(): ?Model {
