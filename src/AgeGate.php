@@ -6,11 +6,16 @@ use Craft;
 use craft\base\Model;
 use craft\base\Plugin;
 use craft\events\RegisterTemplateRootsEvent;
+use craft\helpers\UrlHelper;
+use craft\web\twig\variables\CraftVariable;
 use craft\web\View;
 use thekitchenagency\craftagegate\models\Settings;
 use thekitchenagency\craftagegate\services\AgeGateService;
 use thekitchenagency\craftagegate\resources\AgeGateAssets;
+use thekitchenagency\craftagegate\variables\AgeGateVariable;
 use yii\base\Event;
+use yii\log\Logger;
+use nystudio107\pluginvite\services\VitePluginService;
 
 /**
  * Agegate plugin
@@ -31,7 +36,17 @@ class AgeGate extends Plugin {
 	public static function config(): array {
 		return [
 			'components' => [
-				'ageGate' => AgeGateService::class,
+				'vite' => [
+					'class' => VitePluginService::class,
+					// 'assetClass' => RetourAsset::class,
+					'useDevServer' => true,
+					'devServerPublic' => 'http://localhost:3001',
+					'serverPublic' => 'http://calanda.localhost',
+					//'errorEntry' => 'src/js/Retour.js',
+					'devServerInternal' => 'http://calanda.localhost:3001',
+					'checkDevServer' => true,
+				],
+
 			],
 		];
 	}
@@ -42,19 +57,54 @@ class AgeGate extends Plugin {
 
 		if ( Craft::$app->getRequest()->getIsSiteRequest() ) {
 			Craft::$app->getView()->registerAssetBundle( AgeGateAssets::class );
-
-			$url = Craft::$app->assetManager->getPublishedUrl( '@thekitchenagency/craftagegate/resources/', true );
-			// Craft::$app->getView()->registerJsVar( 'agegateresources', $url );
 			Craft::$app->getView()->registerJsVar( 'agegatesettings', $this->getSettings() );
+
+			$this->setComponents([
+				'ageGateService' => AgeGateService::class,
+			]);
 		}
 
 		Craft::$app->onInit( function () {
-			$this->attachEventHandlers();
 			self::$plugin   = $this;
 			self::$settings = $this->getSettings();
 
+
+			$entry = [];
+			if(self::$settings->pagePrivacyPolicy) {
+				$entry[] = Craft::$app->getEntries()->getEntryById(self::$settings->pagePrivacyPolicy[0]);
+			}
+
+			if(self::$settings->pageCookiePolicy) {
+				$entry[] = Craft::$app->getEntries()->getEntryById(self::$settings->pageCookiePolicy[0]);
+			}
+
+			$matchingSite = false;
+			if($entry) {
+				foreach ( $entry as $singleEntry ) {
+					if ( Craft::$app->getRequest()->getSegment(1) === $singleEntry->slug ) {
+						$matchingSite = true;
+					}
+				}
+			}
+
+			if(Craft::$app->request->getIsSiteRequest()) {
+				if ( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'modal' ) {
+					$this->ageGateService->renderAgeGate();
+				} else if( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'redirect' && Craft::$app->getRequest()->getSegment(1) != 'agegate' ) {
+					$originalUrl = Craft::$app->getRequest()->getFullUri();
+					Craft::$app->getSession()->set('originalSrcUrl', $originalUrl);
+
+					if ( !isset($_COOKIE[self::$settings->cookieName]) || empty($_COOKIE[self::$settings->cookieName]) ) {
+						Craft::$app->getResponse()->redirect(UrlHelper::siteUrl('agegate'))->send();
+					}
+
+				} else if( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'redirect' && Craft::$app->getRequest()->getSegment(1) == 'agegate' ) {
+					Craft::$app->getView()->registerJsVar( 'originalSrcUrl', Craft::$app->getSession()->get('originalSrcUrl') );
+				}
+			}
 		} );
 
+		$this->attachEventHandlers();
 	}
 
 	protected function createSettingsModel(): ?Model {
@@ -79,7 +129,7 @@ class AgeGate extends Plugin {
 		}
 
 		if ( self::$settings->pageRedirection ) {
-			foreach ( self::$settings->pageCookiePolicy as $entryID ) {
+			foreach ( self::$settings->pageRedirection as $entryID ) {
 				$redirectedPage[] = Craft::$app->elements->getElementById( $entryID );
 			}
 		}
@@ -101,5 +151,17 @@ class AgeGate extends Plugin {
 				$event->roots['_agegate'] = __DIR__ . '/templates/agegate/';
 			}
 		);
+
+		Event::on(
+			CraftVariable::class,
+			CraftVariable::EVENT_INIT,
+			function (Event $event) {
+				/** @var CraftVariable $variable */
+				$variable = $event->sender;
+				$variable->set('ageGate', AgeGateVariable::class);
+			}
+		);
+
+		Craft::getLogger()->log($this->id . ' loaded successfully', Logger::LEVEL_INFO, $this->id);
 	}
 }

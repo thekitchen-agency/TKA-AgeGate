@@ -1,4 +1,26 @@
 #agegate {
+    --backgroundColor: rgba(255,255,255,0);
+    --borderRadius: 12px;
+    --textAlign: center;
+}
+
+#agegate {
+    text-align: center;
+}
+
+#agegate h1,
+#agegate h2,
+#agegate h3,
+#agegate p {
+    text-align: var(--textAlign);
+}
+
+#agegate p {
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+#agegate[data-type="modal"] {
     z-index: 999;
     position: absolute;
     display: flex;
@@ -7,8 +29,17 @@
     inset: 0;
 }
 
-#agegate .wrap {
-    background: rgba(255,255,255,0.4);
+#agegate[data-type="redirect"],
+#agegate[data-type="component"] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    inset: 0;
+}
+
+#agegate[data-type="redirect"] .wrap,
+#agegate[data-type="component"] .wrap {
+    background: var(--backgroundColor);
     width: 60vw;
     aspect-ratio: 16 / 10;
 }
@@ -21,6 +52,6 @@
     inset: 0;
 }
 
-body.agegate-active {
-    overflow: hidden;
+body.agegate-active div.inner-container {
+    min-height: 20vh;
 }
