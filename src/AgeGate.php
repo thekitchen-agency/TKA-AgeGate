@@ -14,6 +14,7 @@ use thekitchenagency\craftagegate\services\AgeGateService;
 use thekitchenagency\craftagegate\resources\AgeGateAssets;
 use thekitchenagency\craftagegate\variables\AgeGateVariable;
 use yii\base\Event;
+use yii\log\Logger;
 
 /**
  * Agegate plugin
@@ -31,13 +32,13 @@ class AgeGate extends Plugin {
 	public string $schemaVersion = '1.0.2';
 	public bool $hasCpSettings = true;
 
-	public static function config(): array {
+	/*public static function config(): array {
 		return [
 			'components' => [
 				'ageGate' => AgeGateService::class,
 			],
 		];
-	}
+	}*/
 
 	public function init() {
 		parent::init();
@@ -47,6 +48,9 @@ class AgeGate extends Plugin {
 			Craft::$app->getView()->registerAssetBundle( AgeGateAssets::class );
 			Craft::$app->getView()->registerJsVar( 'agegatesettings', $this->getSettings() );
 
+			$this->setComponents([
+				'ageGateService' => AgeGateService::class,
+			]);
 		}
 
 		Craft::$app->onInit( function () {
@@ -73,10 +77,19 @@ class AgeGate extends Plugin {
 				}
 			}
 
-			if ( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'modal' ) {
-				$this->ageGate->renderAgeGate();
-			} else if( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'redirect' && Craft::$app->getResponse().getSegment(1) != 'agegate' ) {
-				Craft::$app->getResponse()->redirect(UrlHelper::siteUrl('agegate'))->send();
+			if(Craft::$app->request->getIsCpRequest()
+			   || Craft::$app->request->getIsConsoleRequest()
+			   || Craft::$app->request->getIsLivePreview()
+			   || Craft::$app->request->getIsPreview()
+			   || (Craft::$app->request->hasMethod("getIsAjax") && Craft::$app->request->getIsAjax())
+			   || (Craft::$app->request->hasMethod("getIsLivePreview") && (Craft::$app->request->getIsLivePreview() && CookieConsentBanner::$plugin->getSettings()->disable_in_live_preview))) {
+				return false;
+			} else {
+				if ( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'modal' ) {
+					$this->ageGateService->renderAgeGate();
+				} else if( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'redirect' && Craft::$app->getRequest()->getSegment(1) != 'agegate' ) {
+					// Craft::$app->getResponse()->redirect(UrlHelper::siteUrl('agegate'))->send();
+				}
 			}
 		} );
 
@@ -104,7 +117,7 @@ class AgeGate extends Plugin {
 		}
 
 		if ( self::$settings->pageRedirection ) {
-			foreach ( self::$settings->pageCookiePolicy as $entryID ) {
+			foreach ( self::$settings->pageRedirection as $entryID ) {
 				$redirectedPage[] = Craft::$app->elements->getElementById( $entryID );
 			}
 		}
@@ -133,8 +146,10 @@ class AgeGate extends Plugin {
 			function (Event $event) {
 				/** @var CraftVariable $variable */
 				$variable = $event->sender;
-				$variable->set('agegate', AgeGateVariable::class);
+				$variable->set('ageGate', AgeGateVariable::class);
 			}
 		);
+
+		Craft::getLogger()->log($this->id . ' loaded successfully', Logger::LEVEL_INFO, $this->id);
 	}
 }
