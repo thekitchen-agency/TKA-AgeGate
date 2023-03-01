@@ -15,6 +15,7 @@ use thekitchenagency\craftagegate\resources\AgeGateAssets;
 use thekitchenagency\craftagegate\variables\AgeGateVariable;
 use yii\base\Event;
 use yii\log\Logger;
+use nystudio107\pluginvite\services\VitePluginService;
 
 /**
  * Agegate plugin
@@ -31,6 +32,24 @@ class AgeGate extends Plugin {
 
 	public string $schemaVersion = '1.0.2';
 	public bool $hasCpSettings = true;
+
+	public static function config(): array {
+		return [
+			'components' => [
+				'vite' => [
+					'class' => VitePluginService::class,
+					// 'assetClass' => RetourAsset::class,
+					'useDevServer' => true,
+					'devServerPublic' => 'http://localhost:3001',
+					'serverPublic' => 'http://calanda.localhost',
+					//'errorEntry' => 'src/js/Retour.js',
+					'devServerInternal' => 'http://calanda.localhost:3001',
+					'checkDevServer' => true,
+				],
+
+			],
+		];
+	}
 
 	public function init() {
 		parent::init();

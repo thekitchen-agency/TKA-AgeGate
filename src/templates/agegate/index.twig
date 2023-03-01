@@ -11,22 +11,22 @@
 
 {% switch displayType %}
     {% case 'modal' %}
-    <article class="modal" id="agegate">
+    <div class="modal" id="agegate" data-type="modal">
         <div class="wrap">
-            <h3>{{ settings.agegateTitle }}</h3>
+            <h3>{{ settings.agegateTitle|replace('[minAge]', minAge) }}</h3>
             <p>{{ settings.agegateContent | replace('[Cookies]', agbPage) | replace('[Datenschutz]', cookiesPage) | raw }}</p>
             <a href="#" class="button solid confirm-ag">{{ settings.agegateAgreeButton|replace('[minAge]', minAge) }}</a>
             <a href="#" class="button outline decline-ag">{{ settings.agegateDeclineButton|replace('[minAge]', minAge) }}</a>
         </div>
-    </article>
+    </div>
     <div class="ag-verifyOverlay"></div>
-    {% case 'redirect' %}
-    <article class="component" id="agegate">
+    {% case 'redirect' or 'component' %}
+    <div class="component" id="agegate" data-type="component">
         <div class="wrap">
-            <h3>{{ settings.agegateTitle }}</h3>
+            <h1>{{ settings.agegateTitle|replace('[minAge]', minAge) }}</h1>
             <p>{{ settings.agegateContent | replace('[Cookies]', agbPage) | replace('[Datenschutz]', cookiesPage) | raw }}</p>
             <a href="#" class="button solid confirm-ag">{{ settings.agegateAgreeButton|replace('[minAge]', minAge) }}</a>
             <a href="#" class="button outline decline-ag">{{ settings.agegateDeclineButton|replace('[minAge]', minAge) }}</a>
         </div>
-    </article>
+    </div>
 {% endswitch %}
