@@ -13,8 +13,12 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             setCookie();
             document.body.classList.remove('agegate-active');
-            document.getElementById('agegate').remove();
-            document.querySelector('.ag-verifyOverlay').remove();
+
+            if(window.agegatesettings.displayType === 'modal') {
+                document.getElementById('agegate').remove();
+                document.querySelector('.ag-verifyOverlay').remove();
+            }
+
             if(window.agegatesettings.displayType === 'redirect') {
                 window.location = window.originalSrcUrl;
             }
