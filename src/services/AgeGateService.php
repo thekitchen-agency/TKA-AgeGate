@@ -6,10 +6,16 @@ use Craft;
 use craft\base\Component;
 use craft\web\View;
 use thekitchenagency\craftagegate\AgeGate;
+use thekitchenagency\craftagegate\records\SettingsRecord;
 use yii\log\Logger;
 
 class AgeGateService extends Component
 {
+	public function getCurrentSiteAgeGateSettings(): array {
+		$params = ['agegateSiteId' => Craft::$app->sites->currentSite->id];
+
+		return SettingsRecord::findOne($params);
+	}
 	public function renderAgeGate(): bool {
 		$settings = AgeGate::$plugin->getSettings();
 
@@ -31,7 +37,7 @@ class AgeGateService extends Component
 		if( !Craft::$app->request->getIsSiteRequest() ) {
 			return false;
 		}
-		$html = Craft::$app->getView()->renderTemplate('_agegate/index.twig', ['settings' => $settings]);
+		$html = Craft::$app->getView()->renderTemplate('_agegate/index.twig', ['settings' => $settings], View::TEMPLATE_MODE_SITE);
 		echo $html;
 	}
 }

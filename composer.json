@@ -1,33 +1,43 @@
 {
-    "name": "thekitchen-agency/craft-agegate",
-    "description": "A description",
-    "type": "craft-plugin",
-    "license": "proprietary",
-    "require": {
-        "php": ">=8.0.2",
-        "craftcms/cms": "^4.3.10",
-        "nystudio107/craft-plugin-vite": "^4.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "thekitchenagency\\craftagegate\\": "src/"
-        }
-    },
-    "extra": {
-        "handle": "craft-agegate",
-        "name": "Agegate",
-        "developer": "thekitchen.agency",
-        "documentationUrl": "",
-        "class": "thekitchenagency\\craftagegate\\AgeGate"
-    },
-    "config": {
-        "sort-packages": true,
-        "platform": {
-            "php": "8.0.2"
-        },
-        "allow-plugins": {
-            "yiisoft/yii2-composer": true,
-            "craftcms/plugin-installer": true
-        }
+  "name": "thekitchen-agency/craft-agegate",
+  "description": "Use a full featured agegate to protect your site from under-aged visitors.",
+  "type": "craft-plugin",
+  "keywords": [
+    "craft",
+    "craftcms",
+    "craftcms4",
+    "craft-plugin",
+    "craft-agegate"
+  ],
+  "support": {
+    "issues": "https://github.com/thekitchen-agency/TKA-AgeGate/issues",
+    "docs": "https://github.com/thekitchen-agency/TKA-AgeGate/wiki"
+  },
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "TheKitchen Agency",
+      "homepage": "https://thekitchen.agency",
+      "email": "tech@thekitchen.agency"
     }
+  ],
+  "require": {
+    "php": ">=8.0.2",
+    "craftcms/cms": "^4.3.10",
+    "nystudio107/craft-plugin-vite": "^4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "thekitchenagency\\craftagegate\\": "src/"
+    }
+  },
+  "extra": {
+    "name": "Agegate",
+    "handle": "craft-agegate",
+    "changelogUrl": "https://github.com/thekitchen-agency/TKA-AgeGate/blob/main/CHANGELOG.md",
+    "class": "thekitchenagency\\craftagegate\\AgeGate",
+    "components": {
+      "ageGateService": "thekitchenagency\\craftagegate\\services\\AgeGateService"
+    }
+  }
 }

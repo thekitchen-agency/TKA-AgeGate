@@ -1,0 +1,138 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{# @var plugin \thekitchenagency\craftagegate\AgeGate #}
+{# @var settings \thekitchenagency\craftagegate\models\Settings #}
+
+{% extends "_layouts/cp" %}
+{% import '_includes/forms.twig' as forms %}
+{% set title = "agegate-settings-title"|t('craft-agegate') %}
+
+{% css %}
+{% endcss %}
+
+{% block header %}
+    {{ block('pageTitle') }}
+    {{ block('languageMenu') }}
+{% endblock %}
+
+{# {% set currentSite = craft.app.request.getQueryParam('site') %}
+{% set siteId = craft.app.sites.allSiteIds()[0] %} #}
+
+{% block languageMenu %}
+    <div id="sites-btn" class="btn menubtn" data-icon="world">{{ craft.app.sites.getSiteById(siteId).name }}</div>
+    <div class="menu">
+        {% set siteIds = craft.app.sites.allSiteIds() %}
+        <ul class="padded">
+            {% for id in siteIds %}
+                {% set site = craft.app.sites.getSiteById(id) %}
+                <li>
+                    <a {% if id == siteId %}class="sel"
+                       {% else %}href="{{ cpUrl('craft-agegate/settings/'~site.id~'', {'site':site.handle}) }}"{% endif %}>
+                        {{ site.name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+
+{% set content %}
+    <form method="post">
+
+        {{ csrfInput() }}
+        <input type="hidden" name="action" value="craft-agegate/settings/save-plugin-settings">
+
+        {% namespace "settings" %}
+            {{ forms.hidden({
+                name: 'siteId',
+                value: siteId
+            }) }}
+
+            {{ forms.lightswitchField({
+                label: "Enabled"|t,
+                id: 'isAgeGateEnabled',
+                name: 'isAgeGateEnabled',
+                instructions: "General Switch"|t,
+                on: settings['isAgeGateEnabled'] ? settings['isAgeGateEnabled'] : ''
+            }) }}
+
+            {{ forms.textField({
+                label: 'Minimum Age Allowed',
+                name: 'minimumAgeAllowed',
+                value: settings['minimumAgeAllowed']
+            }) }}
+
+            {{ forms.textField({
+                label: 'Cookie Name',
+                name: 'cookieName',
+                value: settings['cookieName']
+            }) }}
+
+            {{ forms.textField({
+                label: 'Redirect URL',
+                instructions: 'URL to redirect to if user is under the minimum age',
+                name: 'declineUrl',
+                value: settings['declineUrl']
+            }) }}
+
+            {{ forms.selectField({
+                label: "AgeGate Type"|t,
+                instructions: "Set the type of user action prompted by the banner"|t,
+                id: 'type',
+                name: 'displayType',
+                options: { 'modal': "Modal"|t, 'component': "Component"|t, 'redirect': "Redirect"|t },
+                value: settings['displayType']
+            }) }}
+
+            {{ forms.textField({
+                label: 'Title of Age Gate',
+                name: 'agegateTitle',
+                value: settings['agegateTitle']
+            }) }}
+
+            {{ forms.textField({
+                label: 'Content of agegate',
+                name: 'agegateContent',
+                value: settings['agegateContent']
+            }) }}
+
+            {{ forms.textField({
+                label: 'Agree Button',
+                name: 'agegateAgreeButton',
+                value: settings['agegateAgreeButton']
+            }) }}
+
+            {{ forms.textField({
+                label: 'Decline Button',
+                name: 'agegateDeclineButton',
+                value: settings['agegateDeclineButton']
+            }) }}
+
+            {# {{ forms.elementSelectField({
+                elementType: 'craft\\elements\\Entry',
+                label: 'Select Privacy Policy Page',
+                name: 'pagePrivacyPolicy',
+                elements: pagePrivacy
+            }) }}
+
+            {{ forms.elementSelectField({
+                elementType: 'craft\\elements\\Entry',
+                label: 'Select Cookie Policy Page',
+                name: 'pageCookiePolicy',
+                id: 'pageCookiePolicy',
+                elements: pageCookie
+            }) }}
+
+            {{ forms.elementSelectField({
+                elementType: 'craft\\elements\\Entry',
+                label: 'Age Gate Page',
+                name: 'pageRedirection',
+                elements: pageRedirected
+            }) }} #}
+        {% endnamespace %}
+
+        <input type="submit" class="submit btn" value="{{ 'Save'|t }}">
+    </form>
+{% endset %}
+
+{% js %}
+{% endjs %}
