@@ -2,7 +2,6 @@
 
 namespace thekitchenagency\craftagegate;
 
-use AWS\CRT\Log;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin;
@@ -22,7 +21,6 @@ use thekitchenagency\craftagegate\models\Settings;
 use thekitchenagency\craftagegate\resources\AgeGateAssets;
 use thekitchenagency\craftagegate\services\AgeGateService as AgeGateService;
 use thekitchenagency\craftagegate\variables\AgeGateVariable as AgeGateVariable;
-// use thekitchenagency\craftagegate\resources\AgeGateAssets;
 use yii\base\Event;
 use yii\log\Logger;
 

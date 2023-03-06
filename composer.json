@@ -24,7 +24,8 @@
   "require": {
     "php": ">=8.0.2",
     "craftcms/cms": "^4.3.10",
-    "nystudio107/craft-plugin-vite": "^4.0"
+    "nystudio107/craft-plugin-vite": "^4.0",
+    "jaybizzle/crawler-detect": "^1.2"
   },
   "autoload": {
     "psr-4": {
@@ -38,6 +39,12 @@
     "class": "thekitchenagency\\craftagegate\\AgeGate",
     "components": {
       "agegateService": "thekitchenagency\\craftagegate\\services\\AgeGateService"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
     }
   }
 }
