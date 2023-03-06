@@ -59,10 +59,6 @@ class AgeGate extends Plugin {
 		parent::init();
 		self::$plugin = $this;
 
-		/*if ( Craft::$app->getRequest()->getIsSiteRequest() ) {
-
-		}*/
-
 		$this->setComponents([
 			'ageGateService' => AgeGateService::class,
 		]);
@@ -82,7 +78,7 @@ class AgeGate extends Plugin {
 					}
 				}
 			} else if(self::$settings->isAgeGateEnabled && self::$settings->displayType === 'redirect') {
-				$this->ageGateService->init();
+				$this->ageGateService->initRedirectionAgegate();
 			}
 		} );
 	}
@@ -107,7 +103,7 @@ class AgeGate extends Plugin {
 	}
 
 	public function getSettingsResponse(): mixed {
-		return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('craft-agegate/settings'));
+		return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('craft-agegate/settings/1'));
 	}
 
 	// Protected Methods

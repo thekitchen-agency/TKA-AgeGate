@@ -9,19 +9,28 @@
 {% css %}
 {% endcss %}
 
+{% set tabs = {
+    content: {
+        label: 'Content'|t('plugin-handle'),
+        url: '#content',
+    },
+    settings: {
+        label: 'Settings'|t('plugin-handle'),
+        url: '#settings',
+    },
+} %}
+
 {% block header %}
     {{ block('pageTitle') }}
     {{ block('languageMenu') }}
 {% endblock %}
 
-{# {% set currentSite = craft.app.request.getQueryParam('site') %}
-{% set siteId = craft.app.sites.allSiteIds()[0] %} #}
-
 {% block languageMenu %}
     <div id="sites-btn" class="btn menubtn" data-icon="world">{{ craft.app.sites.getSiteById(siteId).name }}</div>
     <div class="menu">
         {% set siteIds = craft.app.sites.allSiteIds() %}
-        <ul class="padded">
+        {{ dump(siteIds) }}
+        <ul class="">
             {% for id in siteIds %}
                 {% set site = craft.app.sites.getSiteById(id) %}
                 <li>
@@ -35,8 +44,27 @@
     </div>
 {% endblock %}
 
+{% set crumbs = [
+    {
+        label: 'Age Gate'|t('craft-agegate'),
+        url: url('craft-agegate'),
+    },
+    {
+        label: 'Settings'|t('craft-agegate'),
+        url: url('craft-agegate/settings/1'),
+    },
+] %}
+
+{% block footer %}
+    {{ 'thekitchen-agency' }}
+{% endblock %}
+
+{#{% block sidebar %}
+    {{ 'thekitchen-agency' }}
+{% endblock %}#}
+
 {% set content %}
-    <form method="post">
+    <form method="post" data-saveshortcut data-confirm-unload>
 
         {{ csrfInput() }}
         <input type="hidden" name="action" value="craft-agegate/settings/save-plugin-settings">
@@ -107,27 +135,31 @@
                 value: settings['agegateDeclineButton']
             }) }}
 
-             {{ forms.elementSelectField({
-                elementType: 'craft\\elements\\Entry',
-                label: 'Select Privacy Policy Page',
-                name: 'pagePrivacyPolicy',
-                elements: pagePrivacyPolicy
-            }) }}
+            <div class="agegate-settings-entries">
+                <div>
+                    {{ forms.elementSelectField({
+                        elementType: 'craft\\elements\\Entry',
+                        label: 'Select Privacy Policy Page',
+                        name: 'pagePrivacyPolicy',
+                        elements: pagePrivacyPolicy
+                    }) }}
 
-            {{ forms.elementSelectField({
-                elementType: 'craft\\elements\\Entry',
-                label: 'Select Cookie Policy Page',
-                name: 'pageCookiePolicy',
-                id: 'pageCookiePolicy',
-                elements: pageCookiePolicy
-            }) }}
+                    {{ forms.elementSelectField({
+                        elementType: 'craft\\elements\\Entry',
+                        label: 'Select Cookie Policy Page',
+                        name: 'pageCookiePolicy',
+                        id: 'pageCookiePolicy',
+                        elements: pageCookiePolicy
+                    }) }}
 
-            {{ forms.elementSelectField({
-                elementType: 'craft\\elements\\Entry',
-                label: 'Age Gate Page',
-                name: 'pageRedirection',
-                elements: pageRedirected
-            }) }}
+                    {{ forms.elementSelectField({
+                        elementType: 'craft\\elements\\Entry',
+                        label: 'Age Gate Page',
+                        name: 'pageRedirection',
+                        elements: pageRedirected
+                    }) }}
+                </div>
+            </div>
         {% endnamespace %}
 
         <input type="submit" class="submit btn" value="{{ 'Save'|t }}">

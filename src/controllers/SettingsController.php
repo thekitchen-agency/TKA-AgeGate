@@ -98,7 +98,7 @@ class SettingsController extends Controller {
 		$longAccessRecord->setAttribute('pageRedirection', $settings['pageRedirection']);
 
 		if (!$longAccessRecord->save()) {
-			Craft::$app->getSession()->setError(Craft::t('app', "Couldn't save plugin settings."));
+			Craft::$app->getSession()->setError(Craft::t('app', "cant save settings"));
 
 			Craft::$app->getUrlManager()->setRouteParams([
 				'plugin' => $plugin
