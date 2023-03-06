@@ -111,7 +111,7 @@
                 elementType: 'craft\\elements\\Entry',
                 label: 'Select Privacy Policy Page',
                 name: 'pagePrivacyPolicy',
-                elements: settings['pagePrivacy']
+                elements: pagePrivacyPolicy
             }) }}
 
             {{ forms.elementSelectField({
@@ -119,14 +119,14 @@
                 label: 'Select Cookie Policy Page',
                 name: 'pageCookiePolicy',
                 id: 'pageCookiePolicy',
-                elements: settings['pageCookie']
+                elements: pageCookiePolicy
             }) }}
 
             {{ forms.elementSelectField({
                 elementType: 'craft\\elements\\Entry',
                 label: 'Age Gate Page',
                 name: 'pageRedirection',
-                elements: settings['pageRedirection']
+                elements: pageRedirected
             }) }}
         {% endnamespace %}
 

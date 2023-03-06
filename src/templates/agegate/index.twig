@@ -5,8 +5,8 @@
 {% endmacro %}
 
 {% set minAge = settings.minimumAgeAllowed %}
-{#{% set agbPage = _self.convertToLink(craft.entries().id(settings.pagePrivacyPolicy).one()) %}
-{% set cookiesPage = _self.convertToLink(craft.entries().id(settings.pageCookiePolicy).one()) %}#}
+{% set agbPage = _self.convertToLink(craft.entries().id(settings.pagePrivacyPolicy|json_decode).one()) %}
+{% set cookiesPage = _self.convertToLink(craft.entries().id(settings.pageCookiePolicy|json_decode).one()) %}
 {% set displayType = settings.displayType %}
 
 {% switch displayType %}

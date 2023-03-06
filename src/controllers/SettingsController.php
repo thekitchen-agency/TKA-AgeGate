@@ -27,9 +27,36 @@ class SettingsController extends Controller {
 			$settingsRecord = new SettingsRecord();
 		}
 
+		if($settingsRecord) {
+			$pagePrivacyPolicy = [];
+			$pageCookiePolicy  = [];
+			$redirectedPage = [];
+
+			if ( $settingsRecord->pagePrivacyPolicy ) {
+				foreach ( json_decode($settingsRecord->pagePrivacyPolicy) as $entryID ) {
+					$pagePrivacyPolicy[] = Craft::$app->elements->getElementById( intval($entryID) );
+				}
+			}
+
+			if ( $settingsRecord->pageCookiePolicy ) {
+				foreach ( json_decode($settingsRecord->pageCookiePolicy) as $entryID ) {
+					$pageCookiePolicy[] = Craft::$app->elements->getElementById( intval($entryID) );
+				}
+			}
+
+			if ( $settingsRecord->pageRedirection ) {
+				foreach ( json_decode($settingsRecord->pageRedirection) as $entryID ) {
+					$redirectedPage[] = Craft::$app->elements->getElementById( intval($entryID) );
+				}
+			}
+		}
+
 		return $this->renderTemplate('craft-agegate/settings', [
 			'settings' => $settingsRecord,
 			'siteId' => $siteId,
+			'pagePrivacyPolicy' => $pagePrivacyPolicy,
+			'pageCookiePolicy'  => $pageCookiePolicy,
+			'pageRedirected' => $redirectedPage
 		]);
 	}
 
@@ -66,8 +93,8 @@ class SettingsController extends Controller {
 		$longAccessRecord->setAttribute('agegateContent', $settings['agegateContent']);
 		$longAccessRecord->setAttribute('agegateAgreeButton', $settings['agegateAgreeButton']);
 		$longAccessRecord->setAttribute('agegateDeclineButton', $settings['agegateDeclineButton']);
-		$longAccessRecord->setAttribute('pagePrivacy', $settings['pagePrivacyPolicy']);
-		$longAccessRecord->setAttribute('pageCookie', $settings['pageCookiePolicy']);
+		$longAccessRecord->setAttribute('pagePrivacyPolicy', $settings['pagePrivacyPolicy']);
+		$longAccessRecord->setAttribute('pageCookiePolicy', $settings['pageCookiePolicy']);
 		$longAccessRecord->setAttribute('pageRedirection', $settings['pageRedirection']);
 
 		if (!$longAccessRecord->save()) {

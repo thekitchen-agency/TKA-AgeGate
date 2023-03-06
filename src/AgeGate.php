@@ -58,7 +58,6 @@ class AgeGate extends Plugin {
 	public function init() {
 		parent::init();
 		self::$plugin = $this;
-		// self::$settings = $this->ageGateService->getCurrentSiteAgeGateSettings();
 
 		/*if ( Craft::$app->getRequest()->getIsSiteRequest() ) {
 
@@ -68,14 +67,15 @@ class AgeGate extends Plugin {
 			'ageGateService' => AgeGateService::class,
 		]);
 
-		/*if ( Craft::$app->getRequest()->getIsSiteRequest() ) {
+		self::$settings = $this->ageGateService->getCurrentSiteAgeGateSettings();
+		if ( Craft::$app->getRequest()->getIsSiteRequest() ) {
 			Craft::$app->getView()->registerAssetBundle( AgeGateAssets::class );
 			Craft::$app->getView()->registerJsVar( 'agegatesettings', $this->ageGateService->getCurrentSiteAgeGateSettings() );
-		}*/
+		}
 		$this->attachEventHandlers();
 
 		Craft::$app->onInit( function () {
-			/*if(self::$settings->isAgeGateEnabled && self::$settings->displayType === 'modal') {
+			if(self::$settings->isAgeGateEnabled && self::$settings->displayType === 'modal') {
 				if ( Craft::$app->request->getIsSiteRequest() ) {
 					if ( !isset($_COOKIE[self::$settings->cookieName]) && empty($_COOKIE[self::$settings->cookieName]) ) {
 						$this->ageGateService->renderAgeGate();
@@ -83,7 +83,7 @@ class AgeGate extends Plugin {
 				}
 			} else if(self::$settings->isAgeGateEnabled && self::$settings->displayType === 'redirect') {
 				$this->ageGateService->init();
-			}*/
+			}
 		} );
 	}
 
