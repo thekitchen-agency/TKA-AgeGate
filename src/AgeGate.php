@@ -2,98 +2,149 @@
 
 namespace thekitchenagency\craftagegate;
 
+use AWS\CRT\Log;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin;
+use craft\services\Plugins;
+use craft\events\PluginEvent;
+use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterTemplateRootsEvent;
+use craft\helpers\UrlHelper;
+use craft\log\MonologTarget;
+use craft\web\twig\variables\CraftVariable;
+use craft\web\UrlManager;
 use craft\web\View;
+use Monolog\Formatter\LineFormatter;
+use Psr\Log\LogLevel;
+use thekitchenagency\craftagegate\controllers\AgeGateController;
 use thekitchenagency\craftagegate\models\Settings;
-use thekitchenagency\craftagegate\services\AgeGateService;
 use thekitchenagency\craftagegate\resources\AgeGateAssets;
+use thekitchenagency\craftagegate\services\AgeGateService as AgeGateService;
+use thekitchenagency\craftagegate\variables\AgeGateVariable as AgeGateVariable;
+// use thekitchenagency\craftagegate\resources\AgeGateAssets;
 use yii\base\Event;
+use yii\log\Logger;
 
 /**
  * Agegate plugin
  *
- * @method static AgeGate getInstance()
- * @method Settings getSettings()
  * @author thekitchen.agency
  * @copyright thekitchen.agency
  * @license https://craftcms.github.io/license/ Craft License
  */
 class AgeGate extends Plugin {
+	// Static Properties
+	// =========================================================================
+	/**
+	 * @var AgeGate
+	 */
 	public static $plugin;
 	public static $settings;
 
-	public string $schemaVersion = '1.0.2';
+	// Public Properties
+	// =========================================================================
+
+	public string $schemaVersion = '1.0.3';
 	public bool $hasCpSettings = true;
+	public bool $hasCpSection = false;
 
-	public static function config(): array {
-		return [
-			'components' => [
-				'ageGate' => AgeGateService::class,
-			],
-		];
-	}
+	// Public Methods
+	// =========================================================================
 
+	/**
+	 * @inheritdoc
+	 */
 	public function init() {
 		parent::init();
-		// $this->attachEventHandlers();
+		self::$plugin = $this;
 
+		$this->setComponents([
+			'ageGateService' => AgeGateService::class,
+		]);
+
+		self::$settings = $this->ageGateService->getCurrentSiteAgeGateSettings();
 		if ( Craft::$app->getRequest()->getIsSiteRequest() ) {
 			Craft::$app->getView()->registerAssetBundle( AgeGateAssets::class );
-
-			$url = Craft::$app->assetManager->getPublishedUrl( '@thekitchenagency/craftagegate/resources/', true );
-			// Craft::$app->getView()->registerJsVar( 'agegateresources', $url );
-			Craft::$app->getView()->registerJsVar( 'agegatesettings', $this->getSettings() );
+			Craft::$app->getView()->registerJsVar( 'agegatesettings', $this->ageGateService->getCurrentSiteAgeGateSettings() );
 		}
+		$this->attachEventHandlers();
 
 		Craft::$app->onInit( function () {
-			$this->attachEventHandlers();
-			self::$plugin   = $this;
-			self::$settings = $this->getSettings();
-
+			if(self::$settings->isAgeGateEnabled && self::$settings->displayType === 'modal') {
+				if ( Craft::$app->request->getIsSiteRequest() ) {
+					if ( !isset($_COOKIE[self::$settings->cookieName]) && empty($_COOKIE[self::$settings->cookieName]) ) {
+						$this->ageGateService->renderAgeGate();
+					}
+				}
+			} else if(self::$settings->isAgeGateEnabled && self::$settings->displayType === 'redirect') {
+				$this->ageGateService->initRedirectionAgegate();
+			}
 		} );
-
 	}
 
+	/**
+	 * Logs a message to the plugin's log file.
+	 *
+	 * @param string $message
+	 * @param string $type
+	 *
+	 * @return void
+	 */
+	public function log(string $message, string $type = Logger::LEVEL_INFO): void {
+		Craft::getLogger()->log($message, $type, 'craft-agegate');
+	}
+
+	public function afterSaveSettings(): void {
+		parent::afterSaveSettings();
+		Craft::$app->response
+			->redirect(UrlHelper::cpUrl('craft-agegate/settings'))
+			->send();
+	}
+
+	public function getSettingsResponse(): mixed {
+		return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('craft-agegate/settings/1'));
+	}
+
+	// Protected Methods
+	// =========================================================================
+
+	/**
+	 * @inheritdoc
+	 */
 	protected function createSettingsModel(): ?Model {
-		return Craft::createObject( Settings::class );
+		return new Settings();
 	}
 
 	protected function settingsHtml(): ?string {
-		$pagePrivacy = [];
-		$pageCookie  = [];
-		$redirectedPage = [];
-
-		if ( self::$settings->pagePrivacyPolicy ) {
-			foreach ( self::$settings->pagePrivacyPolicy as $entryID ) {
-				$pagePrivacy[] = Craft::$app->elements->getElementById( $entryID );
-			}
-		}
-
-		if ( self::$settings->pageCookiePolicy ) {
-			foreach ( self::$settings->pageCookiePolicy as $entryID ) {
-				$pageCookie[] = Craft::$app->elements->getElementById( $entryID );
-			}
-		}
-
-		if ( self::$settings->pageRedirection ) {
-			foreach ( self::$settings->pageCookiePolicy as $entryID ) {
-				$redirectedPage[] = Craft::$app->elements->getElementById( $entryID );
-			}
-		}
-
-		return Craft::$app->view->renderTemplate( 'craft-agegate/_settings.twig', [
-			'plugin'      => $this,
-			'pagePrivacy' => $pagePrivacy,
-			'pageCookie'  => $pageCookie,
-			'pageRedirected' => $redirectedPage,
-			'settings'    => $this->getSettings(),
-		] );
+		return Craft::$app->view->renderTemplate('craft-agegate/settings');
 	}
 
 	private function attachEventHandlers(): void {
+		Event::on(
+			UrlManager::class,
+			UrlManager::EVENT_REGISTER_CP_URL_RULES,
+			function(RegisterUrlRulesEvent $event) {
+				$event->rules = array_merge($event->rules, [
+					'craft-agegate/settings' => 'craft-agegate/settings/index',
+					'craft-agegate/settings/<siteId>' => 'craft-agegate/settings/index',
+				]);
+			}
+		);
+
+		Event::on(
+			Plugins::class,
+			Plugins::EVENT_AFTER_INSTALL_PLUGIN,
+			function (PluginEvent $event) {
+				if ($event->plugin === $this) {
+					$request = Craft::$app->getRequest();
+					if ($request->isCpRequest) {
+						Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('craft-agegate/settings'))->send();
+					}
+				}
+			}
+		);
+
 		Event::on(
 			View::class,
 			View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
@@ -101,5 +152,40 @@ class AgeGate extends Plugin {
 				$event->roots['_agegate'] = __DIR__ . '/templates/agegate/';
 			}
 		);
+
+		Event::on(
+			CraftVariable::class,
+			CraftVariable::EVENT_INIT,
+			function (Event $event) {
+				/** @var CraftVariable $variable */
+				$variable = $event->sender;
+				$variable->set('ageGate', AgeGateVariable::class);
+			}
+		);
+
+		Craft::info(
+			Craft::t(
+				'craft-agegate',
+				'{name} plugin loaded',
+				['name' => $this->name]
+			),
+			__METHOD__
+		);
+
+		$this->_registerLogTarget();
+	}
+
+	private function _registerLogTarget() {
+		Craft::getLogger()->dispatcher->targets[] = new MonologTarget([
+			'name' => $this->name,
+			'categories' => [$this->name],
+			'levels' => [LogLevel::INFO],
+			'logContext' => false,
+			'allowLineBreaks' => false,
+			'formatter' => new LineFormatter(
+				format: "[%datetime%] %message%\n",
+				dateFormat: 'Y-m-d H:i:s',
+			),
+		]);
 	}
 }

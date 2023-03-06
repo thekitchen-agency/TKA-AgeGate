@@ -6,15 +6,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
         document.querySelector('#agegate .decline-ag').addEventListener('click', function(e) {
             e.preventDefault();
-            // document.querySelector('#agegate').classList.add('hidden');
             window.location = window.agegatesettings.declineUrl;
         });
         document.querySelector('#agegate .confirm-ag').addEventListener('click', function(e) {
             e.preventDefault();
             setCookie();
             document.body.classList.remove('agegate-active');
-            document.getElementById('agegate').remove();
-            document.querySelector('.ag-verifyOverlay').remove();
+
+            if(window.agegatesettings.displayType === 'modal') {
+                document.getElementById('agegate').remove();
+                document.querySelector('.ag-verifyOverlay').remove();
+            }
+
+            if(window.agegatesettings.displayType === 'redirect') {
+                window.location = window.originalSrcUrl;
+            }
         });
     }
 });

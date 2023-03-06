@@ -10,6 +10,12 @@ use craft\base\Model;
  * Agegate settings
  */
 class Settings extends Model {
+	// Public Properties
+	// =========================================================================
+
+	/**
+	 * @var string
+	 */
 	public $pluginName = 'AgeGate';
 	public $displayType = 'modal';
 	public $isAgeGateEnabled = true;
@@ -30,7 +36,13 @@ class Settings extends Model {
 	public $agegateDeclineButton = 'Leave';
 	public $failureMessage = 'You are not old enough to enter this site';
 
-	public function defineRules(): array {
+	// Public Methods
+	// =========================================================================
+
+	/**
+	 * @inheritdoc
+	 */
+	public function rules(): array {
 		return [
 		];
 	}

@@ -1,16 +1,59 @@
 #agegate {
+    --backgroundColor: rgba(255,255,255,0.6);
+    --borderRadius: 12px;
+    --textAlign: center;
+}
+
+#agegate {
+    text-align: center;
+}
+
+#agegate a.button{
+    margin-right: 16px;
+}
+
+#agegate h1,
+#agegate h2,
+#agegate h3,
+#agegate p {
+    text-align: var(--textAlign);
+}
+
+#agegate p {
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+#agegate[data-type="modal"] {
     z-index: 999;
     position: absolute;
     display: flex;
     justify-content: center;
     align-items: center;
     inset: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--backgroundColor);
 }
 
-#agegate .wrap {
-    background: rgba(255,255,255,0.4);
+#agegate[data-type="redirect"],
+#agegate[data-type="component"] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    inset: 0;
+}
+
+#agegate[data-type="redirect"] .wrap,
+#agegate[data-type="component"] .wrap {
+    background: var(--backgroundColor);
     width: 60vw;
     aspect-ratio: 16 / 10;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
 .ag-verifyOverlay {

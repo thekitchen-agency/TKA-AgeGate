@@ -1,0 +1,170 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{# @var plugin \thekitchenagency\craftagegate\AgeGate #}
+{# @var settings \thekitchenagency\craftagegate\models\Settings #}
+
+{% extends "_layouts/cp" %}
+{% import '_includes/forms.twig' as forms %}
+{% set title = "agegate-settings-title"|t('craft-agegate') %}
+
+{% css %}
+{% endcss %}
+
+{% set tabs = {
+    content: {
+        label: 'Content'|t('plugin-handle'),
+        url: '#content',
+    },
+    settings: {
+        label: 'Settings'|t('plugin-handle'),
+        url: '#settings',
+    },
+} %}
+
+{% block header %}
+    {{ block('pageTitle') }}
+    {{ block('languageMenu') }}
+{% endblock %}
+
+{% block languageMenu %}
+    <div id="sites-btn" class="btn menubtn" data-icon="world">{{ craft.app.sites.getSiteById(siteId).name }}</div>
+    <div class="menu">
+        {% set siteIds = craft.app.sites.allSiteIds() %}
+        {{ dump(siteIds) }}
+        <ul class="">
+            {% for id in siteIds %}
+                {% set site = craft.app.sites.getSiteById(id) %}
+                <li>
+                    <a {% if id == siteId %}class="sel"
+                       {% else %}href="{{ cpUrl('craft-agegate/settings/'~site.id~'', {'site':site.handle}) }}"{% endif %}>
+                        {{ site.name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+
+{% set crumbs = [
+    {
+        label: 'Age Gate'|t('craft-agegate'),
+        url: url('craft-agegate'),
+    },
+    {
+        label: 'Settings'|t('craft-agegate'),
+        url: url('craft-agegate/settings/1'),
+    },
+] %}
+
+{% block footer %}
+    {{ 'thekitchen-agency' }}
+{% endblock %}
+
+{#{% block sidebar %}
+    {{ 'thekitchen-agency' }}
+{% endblock %}#}
+
+{% set content %}
+    <form method="post" data-saveshortcut data-confirm-unload>
+
+        {{ csrfInput() }}
+        <input type="hidden" name="action" value="craft-agegate/settings/save-plugin-settings">
+
+        {% namespace "settings" %}
+            {{ forms.hidden({
+                name: 'siteId',
+                value: siteId
+            }) }}
+
+            {{ forms.lightswitchField({
+                label: "Enabled"|t,
+                id: 'isAgeGateEnabled',
+                name: 'isAgeGateEnabled',
+                instructions: "General Switch"|t,
+                on: settings['isAgeGateEnabled'] ? settings['isAgeGateEnabled'] : ''
+            }) }}
+
+            {{ forms.textField({
+                label: 'Minimum Age Allowed',
+                name: 'minimumAgeAllowed',
+                value: settings['minimumAgeAllowed']
+            }) }}
+
+            {{ forms.textField({
+                label: 'Cookie Name',
+                name: 'cookieName',
+                value: settings['cookieName']
+            }) }}
+
+            {{ forms.textField({
+                label: 'Redirect URL',
+                instructions: 'URL to redirect to if user is under the minimum age',
+                name: 'declineUrl',
+                value: settings['declineUrl']
+            }) }}
+
+            {{ forms.selectField({
+                label: "AgeGate Type"|t,
+                instructions: "Set the type of user action prompted by the banner"|t,
+                id: 'type',
+                name: 'displayType',
+                options: { 'modal': "Modal"|t, 'component': "Component"|t, 'redirect': "Redirect"|t },
+                value: settings['displayType']
+            }) }}
+
+            {{ forms.textField({
+                label: 'Title of Age Gate',
+                name: 'agegateTitle',
+                value: settings['agegateTitle']
+            }) }}
+
+            {{ forms.textField({
+                label: 'Content of agegate',
+                name: 'agegateContent',
+                value: settings['agegateContent']
+            }) }}
+
+            {{ forms.textField({
+                label: 'Agree Button',
+                name: 'agegateAgreeButton',
+                value: settings['agegateAgreeButton']
+            }) }}
+
+            {{ forms.textField({
+                label: 'Decline Button',
+                name: 'agegateDeclineButton',
+                value: settings['agegateDeclineButton']
+            }) }}
+
+            <div class="agegate-settings-entries">
+                <div>
+                    {{ forms.elementSelectField({
+                        elementType: 'craft\\elements\\Entry',
+                        label: 'Select Privacy Policy Page',
+                        name: 'pagePrivacyPolicy',
+                        elements: pagePrivacyPolicy
+                    }) }}
+
+                    {{ forms.elementSelectField({
+                        elementType: 'craft\\elements\\Entry',
+                        label: 'Select Cookie Policy Page',
+                        name: 'pageCookiePolicy',
+                        id: 'pageCookiePolicy',
+                        elements: pageCookiePolicy
+                    }) }}
+
+                    {{ forms.elementSelectField({
+                        elementType: 'craft\\elements\\Entry',
+                        label: 'Age Gate Page',
+                        name: 'pageRedirection',
+                        elements: pageRedirected
+                    }) }}
+                </div>
+            </div>
+        {% endnamespace %}
+
+        <input type="submit" class="submit btn" value="{{ 'Save'|t }}">
+    </form>
+{% endset %}
+
+{% js %}
+{% endjs %}
