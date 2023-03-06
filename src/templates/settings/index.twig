@@ -107,11 +107,11 @@
                 value: settings['agegateDeclineButton']
             }) }}
 
-            {# {{ forms.elementSelectField({
+             {{ forms.elementSelectField({
                 elementType: 'craft\\elements\\Entry',
                 label: 'Select Privacy Policy Page',
                 name: 'pagePrivacyPolicy',
-                elements: pagePrivacy
+                elements: settings['pagePrivacy']
             }) }}
 
             {{ forms.elementSelectField({
@@ -119,15 +119,15 @@
                 label: 'Select Cookie Policy Page',
                 name: 'pageCookiePolicy',
                 id: 'pageCookiePolicy',
-                elements: pageCookie
+                elements: settings['pageCookie']
             }) }}
 
             {{ forms.elementSelectField({
                 elementType: 'craft\\elements\\Entry',
                 label: 'Age Gate Page',
                 name: 'pageRedirection',
-                elements: pageRedirected
-            }) }} #}
+                elements: settings['pageRedirection']
+            }) }}
         {% endnamespace %}
 
         <input type="submit" class="submit btn" value="{{ 'Save'|t }}">

@@ -17,10 +17,11 @@ use craft\web\UrlManager;
 use craft\web\View;
 use Monolog\Formatter\LineFormatter;
 use Psr\Log\LogLevel;
+use thekitchenagency\craftagegate\controllers\AgeGateController;
 use thekitchenagency\craftagegate\models\Settings;
 use thekitchenagency\craftagegate\resources\AgeGateAssets;
 use thekitchenagency\craftagegate\services\AgeGateService as AgeGateService;
-use thekitchenagency\craftagegate\variables\AgeGateVariable;
+use thekitchenagency\craftagegate\variables\AgeGateVariable as AgeGateVariable;
 // use thekitchenagency\craftagegate\resources\AgeGateAssets;
 use yii\base\Event;
 use yii\log\Logger;
@@ -39,13 +40,14 @@ class AgeGate extends Plugin {
 	 * @var AgeGate
 	 */
 	public static $plugin;
+	public static $settings;
 
 	// Public Properties
 	// =========================================================================
 
 	public string $schemaVersion = '1.0.3';
 	public bool $hasCpSettings = true;
-	public bool $hasCpSection = true;
+	public bool $hasCpSection = false;
 
 	// Public Methods
 	// =========================================================================
@@ -56,53 +58,31 @@ class AgeGate extends Plugin {
 	public function init() {
 		parent::init();
 		self::$plugin = $this;
+		// self::$settings = $this->ageGateService->getCurrentSiteAgeGateSettings();
 
-		if ( Craft::$app->getRequest()->getIsSiteRequest() ) {
+		/*if ( Craft::$app->getRequest()->getIsSiteRequest() ) {
+
+		}*/
+
+		$this->setComponents([
+			'ageGateService' => AgeGateService::class,
+		]);
+
+		/*if ( Craft::$app->getRequest()->getIsSiteRequest() ) {
 			Craft::$app->getView()->registerAssetBundle( AgeGateAssets::class );
-			Craft::$app->getView()->registerJsVar( 'agegatesettings', $this->getSettings() );
-
-			/*$this->setComponents([
-				'ageGateService' => AgeGateService::class,
-			]);*/
-		}
+			Craft::$app->getView()->registerJsVar( 'agegatesettings', $this->ageGateService->getCurrentSiteAgeGateSettings() );
+		}*/
 		$this->attachEventHandlers();
 
 		Craft::$app->onInit( function () {
-			/*self::$settings = $this->getSettings();
-			$entry = [];
-			if(self::$settings->pagePrivacyPolicy) {
-				$entry[] = Craft::$app->getEntries()->getEntryById(self::$settings->pagePrivacyPolicy[0]);
-			}
-
-			if(self::$settings->pageCookiePolicy) {
-				$entry[] = Craft::$app->getEntries()->getEntryById(self::$settings->pageCookiePolicy[0]);
-			}
-
-			$matchingSite = false;
-			if($entry) {
-				foreach ( $entry as $singleEntry ) {
-					if ( Craft::$app->getRequest()->getSegment(1) === $singleEntry->slug ) {
-						$matchingSite = true;
+			/*if(self::$settings->isAgeGateEnabled && self::$settings->displayType === 'modal') {
+				if ( Craft::$app->request->getIsSiteRequest() ) {
+					if ( !isset($_COOKIE[self::$settings->cookieName]) && empty($_COOKIE[self::$settings->cookieName]) ) {
+						$this->ageGateService->renderAgeGate();
 					}
 				}
-			}*/
-
-
-
-			/*if(Craft::$app->request->getIsSiteRequest()) {
-				if ( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'modal' ) {
-					$this->ageGateService->renderAgeGate();
-				} else if( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'redirect' && Craft::$app->getRequest()->getSegment(1) != 'agegate' ) {
-					$originalUrl = Craft::$app->getRequest()->getFullUri();
-					Craft::$app->getSession()->set('originalSrcUrl', $originalUrl);
-
-					if ( !isset($_COOKIE[self::$settings->cookieName]) || empty($_COOKIE[self::$settings->cookieName]) ) {
-						Craft::$app->getResponse()->redirect(UrlHelper::siteUrl('agegate'))->send();
-					}
-
-				} else if( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'redirect' && Craft::$app->getRequest()->getSegment(1) == 'agegate' ) {
-					Craft::$app->getView()->registerJsVar( 'originalSrcUrl', Craft::$app->getSession()->get('originalSrcUrl') );
-				}
+			} else if(self::$settings->isAgeGateEnabled && self::$settings->displayType === 'redirect') {
+				$this->ageGateService->init();
 			}*/
 		} );
 	}

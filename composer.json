@@ -37,7 +37,7 @@
     "changelogUrl": "https://github.com/thekitchen-agency/TKA-AgeGate/blob/main/CHANGELOG.md",
     "class": "thekitchenagency\\craftagegate\\AgeGate",
     "components": {
-      "ageGateService": "thekitchenagency\\craftagegate\\services\\AgeGateService"
+      "agegateService": "thekitchenagency\\craftagegate\\services\\AgeGateService"
     }
   }
 }

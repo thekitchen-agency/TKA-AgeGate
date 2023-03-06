@@ -42,7 +42,10 @@ class Install extends Migration {
 					'agegateTitle' => $this->string()->defaultValue(''),
 					'agegateContent' => $this->string()->defaultValue(''),
 					'agegateAgreeButton' => $this->string()->defaultValue(''),
-					'agegateDeclineButton' => $this->string()->defaultValue('')
+					'agegateDeclineButton' => $this->string()->defaultValue(''),
+					'pagePrivacy' => $this->string()->defaultValue(''),
+					'pageCookie' => $this->string()->defaultValue(''),
+					'pageRedirection' => $this->string()->defaultValue('')
 				]
 			);
 

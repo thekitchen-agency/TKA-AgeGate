@@ -1,5 +1,5 @@
 #agegate {
-    --backgroundColor: rgba(255,255,255,0);
+    --backgroundColor: rgba(255,255,255,0.6);
     --borderRadius: 12px;
     --textAlign: center;
 }
@@ -31,6 +31,10 @@
     justify-content: center;
     align-items: center;
     inset: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--backgroundColor);
 }
 
 #agegate[data-type="redirect"],
@@ -46,6 +50,10 @@
     background: var(--backgroundColor);
     width: 60vw;
     aspect-ratio: 16 / 10;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
 .ag-verifyOverlay {

@@ -28,8 +28,8 @@ class Settings extends Model {
 	public $ageVerificationPath= 'agegate';
 	public $cookieName = 'tester';
 	public $declineUrl = 'https://www.google.com';
-	public $pagePrivacyPolicy = [];
-	public $pageCookiePolicy = [];
+	public $pagePrivacy = [];
+	public $pageCookie = [];
 	public $pageRedirection = [];
 
 	public $agegateAgreeButton = 'Enter';

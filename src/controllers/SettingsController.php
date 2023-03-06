@@ -66,6 +66,9 @@ class SettingsController extends Controller {
 		$longAccessRecord->setAttribute('agegateContent', $settings['agegateContent']);
 		$longAccessRecord->setAttribute('agegateAgreeButton', $settings['agegateAgreeButton']);
 		$longAccessRecord->setAttribute('agegateDeclineButton', $settings['agegateDeclineButton']);
+		$longAccessRecord->setAttribute('pagePrivacy', $settings['pagePrivacyPolicy']);
+		$longAccessRecord->setAttribute('pageCookie', $settings['pageCookiePolicy']);
+		$longAccessRecord->setAttribute('pageRedirection', $settings['pageRedirection']);
 
 		if (!$longAccessRecord->save()) {
 			Craft::$app->getSession()->setError(Craft::t('app', "Couldn't save plugin settings."));

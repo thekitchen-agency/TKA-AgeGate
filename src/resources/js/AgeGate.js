@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         document.querySelector('#agegate .decline-ag').addEventListener('click', function(e) {
             e.preventDefault();
-            // document.querySelector('#agegate').classList.add('hidden');
             window.location = window.agegatesettings.declineUrl;
         });
         document.querySelector('#agegate .confirm-ag').addEventListener('click', function(e) {
