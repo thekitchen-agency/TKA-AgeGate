@@ -14,6 +14,7 @@ use craft\log\MonologTarget;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
+use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Monolog\Formatter\LineFormatter;
 use Psr\Log\LogLevel;
 use thekitchenagency\craftagegate\controllers\AgeGateController;
@@ -78,6 +79,9 @@ class AgeGate extends Plugin {
 			} else if(self::$settings->isAgeGateEnabled && self::$settings->displayType === 'redirect') {
 				$this->ageGateService->initRedirectionAgegate();
 			}
+
+			// $crawlerDetect = new \Jaybizzle\CrawlerDetect\CrawlerDetect;
+
 		} );
 	}
 
