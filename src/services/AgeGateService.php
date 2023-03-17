@@ -58,6 +58,12 @@ class AgeGateService extends Component
 
 				} else if ( self::$settings->isAgeGateEnabled && ! $matchingSite && self::$settings->displayType === 'redirect' && Craft::$app->getRequest()->getSegment( 1 ) == 'agegate' ) {
 					Craft::$app->getView()->registerJsVar( 'originalSrcUrl', Craft::$app->getSession()->get( 'originalSrcUrl' ) );
+
+					if ( isset( $_COOKIE[ self::$settings->cookieName ] ) || !empty( $_COOKIE[ self::$settings->cookieName ] ) ) {
+						Craft::$app->getResponse()->redirect( Craft::$app->getSession()->get( 'originalSrcUrl' ) )->send();
+					}
+				} else {
+					Craft::$app->getResponse()->redirect( Craft::$app->getSession()->get( 'originalSrcUrl' ) )->send();
 				}
 			}
 		}
