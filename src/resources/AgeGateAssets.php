@@ -11,8 +11,6 @@ class AgeGateAssets extends AssetBundle
 	{
 		$this->sourcePath = '@thekitchenagency/craftagegate/resources/';
 
-		$this->depends = [ CpAsset::class ];
-
 		$this->js = [
 			'js/AgeGate.js',
 		];

@@ -8,13 +8,12 @@
 {% set agbPage = _self.convertToLink(craft.entries().id(settings.pagePrivacyPolicy|json_decode).one()) %}
 {% set cookiesPage = _self.convertToLink(craft.entries().id(settings.pageCookiePolicy|json_decode).one()) %}
 {% set displayType = settings.displayType %}
-
 {% switch displayType %}
     {% case 'modal' %}
     <div class="modal" id="agegate" data-type="modal">
         <div class="wrap">
             <h3>{{ settings.agegateTitle|replace('[minAge]', minAge) }}</h3>
-            {#<p>{{ settings.agegateContent | replace('[Cookies]', agbPage) | replace('[Datenschutz]', cookiesPage) | raw }}</p>#}
+            <p>{{ settings.agegateContent | replace('[Cookies]', agbPage) | replace('[Datenschutz]', cookiesPage) | raw }}</p>
             <a href="#" class="button solid confirm-ag">{{ settings.agegateAgreeButton|replace('[minAge]', minAge) }}</a>
             <a href="#" class="button outline decline-ag">{{ settings.agegateDeclineButton|replace('[minAge]', minAge) }}</a>
         </div>
@@ -24,9 +23,11 @@
     <div class="component" id="agegate" data-type="component">
         <div class="wrap">
             <h1>{{ settings.agegateTitle|replace('[minAge]', minAge) }}</h1>
-            {#<p>{{ settings.agegateContent | replace('[Cookies]', agbPage) | replace('[Datenschutz]', cookiesPage) | raw }}</p>#}
-            <a href="#" class="button solid confirm-ag">{{ settings.agegateAgreeButton|replace('[minAge]', minAge) }}</a>
-            <a href="#" class="button outline decline-ag">{{ settings.agegateDeclineButton|replace('[minAge]', minAge) }}</a>
+            <p>{{ settings.agegateContent | replace('[Cookies]', agbPage) | replace('[Datenschutz]', cookiesPage) | raw }}</p>
+            <div class="controls">
+                <a href="#" class="button solid confirm-ag">{{ settings.agegateAgreeButton|replace('[minAge]', minAge) }}</a>
+                <a href="#" class="button outline dark decline-ag">{{ settings.agegateDeclineButton|replace('[minAge]', minAge) }}</a>
+            </div>
         </div>
     </div>
 {% endswitch %}

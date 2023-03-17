@@ -2,7 +2,10 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('loaded');
 
     if(document.getElementById('agegate')) {
-        document.body.classList.add('agegate-active');
+
+        if(document.getElementById('agegate').getAttribute('data-type') !== 'component') {
+            document.body.classList.add('agegate-active');
+        }
 
         document.querySelector('#agegate .decline-ag').addEventListener('click', function(e) {
             e.preventDefault();

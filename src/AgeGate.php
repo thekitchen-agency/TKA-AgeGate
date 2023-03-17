@@ -2,7 +2,6 @@
 
 namespace thekitchenagency\craftagegate;
 
-use AWS\CRT\Log;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin;
@@ -15,6 +14,7 @@ use craft\log\MonologTarget;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
+use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Monolog\Formatter\LineFormatter;
 use Psr\Log\LogLevel;
 use thekitchenagency\craftagegate\controllers\AgeGateController;
@@ -22,7 +22,6 @@ use thekitchenagency\craftagegate\models\Settings;
 use thekitchenagency\craftagegate\resources\AgeGateAssets;
 use thekitchenagency\craftagegate\services\AgeGateService as AgeGateService;
 use thekitchenagency\craftagegate\variables\AgeGateVariable as AgeGateVariable;
-// use thekitchenagency\craftagegate\resources\AgeGateAssets;
 use yii\base\Event;
 use yii\log\Logger;
 
@@ -80,6 +79,9 @@ class AgeGate extends Plugin {
 			} else if(self::$settings->isAgeGateEnabled && self::$settings->displayType === 'redirect') {
 				$this->ageGateService->initRedirectionAgegate();
 			}
+
+			// $crawlerDetect = new \Jaybizzle\CrawlerDetect\CrawlerDetect;
+
 		} );
 	}
 

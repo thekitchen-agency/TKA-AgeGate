@@ -28,7 +28,24 @@ class AgeGateService extends Component
 	public function initRedirectionAgegate(): void {
 		self::$settings = $this->getCurrentSiteAgeGateSettings();
 
+		$entry = [];
+		if(self::$settings->pagePrivacyPolicy) {
+			$entry[] = Craft::$app->getEntries()->getEntryById(json_decode(self::$settings->pagePrivacyPolicy)[0]);
+		}
+
+		if(self::$settings->pageCookiePolicy) {
+			$entry[] = Craft::$app->getEntries()->getEntryById(json_decode(self::$settings->pageCookiePolicy)[0]);
+		}
+
 		$matchingSite = false;
+		if($entry) {
+			foreach ( $entry as $singleEntry ) {
+				if ( Craft::$app->getRequest()->getSegment(1) === $singleEntry->slug ) {
+					$matchingSite = true;
+				}
+			}
+		}
+
 		if(self::$settings->isAgeGateEnabled && ! $matchingSite  && self::$settings->displayType === 'redirect') {
 			if ( Craft::$app->request->getIsSiteRequest() ) {
 				if ( self::$settings->isAgeGateEnabled && !$matchingSite && self::$settings->displayType === 'redirect' && Craft::$app->getRequest()->getSegment( 1 ) != 'agegate' ) {
@@ -41,6 +58,12 @@ class AgeGateService extends Component
 
 				} else if ( self::$settings->isAgeGateEnabled && ! $matchingSite && self::$settings->displayType === 'redirect' && Craft::$app->getRequest()->getSegment( 1 ) == 'agegate' ) {
 					Craft::$app->getView()->registerJsVar( 'originalSrcUrl', Craft::$app->getSession()->get( 'originalSrcUrl' ) );
+
+					if ( isset( $_COOKIE[ self::$settings->cookieName ] ) || !empty( $_COOKIE[ self::$settings->cookieName ] ) ) {
+						Craft::$app->getResponse()->redirect( Craft::$app->getSession()->get( 'originalSrcUrl' ) )->send();
+					}
+				} else {
+					Craft::$app->getResponse()->redirect( Craft::$app->getSession()->get( 'originalSrcUrl' ) )->send();
 				}
 			}
 		}
