@@ -55,6 +55,12 @@ class AgeGate extends Plugin {
 	 * @inheritdoc
 	 */
 	public function init() {
+		$crawlerDetect = new \Jaybizzle\CrawlerDetect\CrawlerDetect;
+
+		if($crawlerDetect->isCrawler()) {
+			return;
+		}
+
 		parent::init();
 		self::$plugin = $this;
 
@@ -80,7 +86,6 @@ class AgeGate extends Plugin {
 				$this->ageGateService->initRedirectionAgegate();
 			}
 
-			// $crawlerDetect = new \Jaybizzle\CrawlerDetect\CrawlerDetect;
 
 		} );
 	}
