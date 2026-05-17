@@ -4,20 +4,14 @@
 
 {% extends "_layouts/cp" %}
 {% import '_includes/forms.twig' as forms %}
-{% set title = "agegate-settings-title"|t('craft-agegate') %}
-
-{% css %}
-{% endcss %}
+{% set title = "agegate-settings-title"|t('craft-age-gate') %}
 
 {% set tabs = {
-    content: {
-        label: 'Content'|t('plugin-handle'),
-        url: '#content',
-    },
-    settings: {
-        label: 'Settings'|t('plugin-handle'),
-        url: '#settings',
-    },
+    general: { label: 'General Settings'|t, url: '#general-settings' },
+    content: { label: 'Content Settings'|t, url: '#content-settings' },
+    page: { label: 'Page Settings'|t, url: '#page-settings' },
+    styling: { label: 'Styling Settings'|t, url: '#styling-settings' },
+    privacy: { label: 'Privacy Settings'|t, url: '#privacy-settings' }
 } %}
 
 {% block header %}
@@ -29,13 +23,12 @@
     <div id="sites-btn" class="btn menubtn" data-icon="world">{{ craft.app.sites.getSiteById(siteId).name }}</div>
     <div class="menu">
         {% set siteIds = craft.app.sites.allSiteIds() %}
-        {{ dump(siteIds) }}
         <ul class="">
             {% for id in siteIds %}
                 {% set site = craft.app.sites.getSiteById(id) %}
                 <li>
                     <a {% if id == siteId %}class="sel"
-                       {% else %}href="{{ cpUrl('craft-agegate/settings/'~site.id~'', {'site':site.handle}) }}"{% endif %}>
+                       {% else %}href="{{ cpUrl('craft-age-gate/settings/'~site.id~'', {'site':site.handle}) }}"{% endif %}>
                         {{ site.name }}
                     </a>
                 </li>
@@ -46,12 +39,12 @@
 
 {% set crumbs = [
     {
-        label: 'Age Gate'|t('craft-agegate'),
-        url: url('craft-agegate'),
+        label: 'Age Gate'|t('craft-age-gate'),
+        url: url('craft-age-gate'),
     },
     {
-        label: 'Settings'|t('craft-agegate'),
-        url: url('craft-agegate/settings/1'),
+        label: 'Settings'|t('craft-age-gate'),
+        url: url('craft-age-gate/settings/1'),
     },
 ] %}
 
@@ -59,15 +52,10 @@
     {{ 'thekitchen-agency' }}
 {% endblock %}
 
-{#{% block sidebar %}
-    {{ 'thekitchen-agency' }}
-{% endblock %}#}
-
 {% set content %}
     <form method="post" data-saveshortcut data-confirm-unload>
-
         {{ csrfInput() }}
-        <input type="hidden" name="action" value="craft-agegate/settings/save-plugin-settings">
+        <input type="hidden" name="action" value="craft-age-gate/settings/save-plugin-settings">
 
         {% namespace "settings" %}
             {{ forms.hidden({
@@ -75,96 +63,253 @@
                 value: siteId
             }) }}
 
-            {{ forms.lightswitchField({
-                label: "Enabled"|t,
-                id: 'isAgeGateEnabled',
-                name: 'isAgeGateEnabled',
-                instructions: "General Switch"|t,
-                on: settings['isAgeGateEnabled'] ? settings['isAgeGateEnabled'] : ''
-            }) }}
+            <div id="general-settings">
+                {{ forms.lightswitchField({
+                    label: "Enabled"|t,
+                    id: 'isAgeGateEnabled',
+                    name: 'isAgeGateEnabled',
+                    instructions: "General Switch"|t,
+                    on: settings['isAgeGateEnabled'] ? settings['isAgeGateEnabled'] : ''
+                }) }}
 
-            {{ forms.textField({
-                label: 'Minimum Age Allowed',
-                name: 'minimumAgeAllowed',
-                value: settings['minimumAgeAllowed']
-            }) }}
+                {{ forms.textField({
+                    label: 'Minimum Age Allowed',
+                    name: 'minimumAgeAllowed',
+                    value: settings['minimumAgeAllowed']
+                }) }}
 
-            {{ forms.textField({
-                label: 'Cookie Name',
-                name: 'cookieName',
-                value: settings['cookieName']
-            }) }}
+                {{ forms.textField({
+                    label: 'Cookie Name',
+                    name: 'cookieName',
+                    value: settings['cookieName']
+                }) }}
 
-            {{ forms.textField({
-                label: 'Redirect URL',
-                instructions: 'URL to redirect to if user is under the minimum age',
-                name: 'declineUrl',
-                value: settings['declineUrl']
-            }) }}
+                {{ forms.textField({
+                    label: 'Redirect URL',
+                    instructions: 'URL to redirect to if user is under the minimum age',
+                    name: 'declineUrl',
+                    value: settings['declineUrl']
+                }) }}
+            </div>
 
-            {{ forms.selectField({
-                label: "AgeGate Type"|t,
-                instructions: "Set the type of user action prompted by the banner"|t,
-                id: 'type',
-                name: 'displayType',
-                options: { 'modal': "Modal"|t, 'component': "Component"|t, 'redirect': "Redirect"|t },
-                value: settings['displayType']
-            }) }}
+            <div id="content-settings" class="hidden">
+                {{ forms.selectField({
+                    label: "AgeGate Type"|t,
+                    instructions: "Set the type of user action prompted by the banner"|t,
+                    id: 'type',
+                    name: 'displayType',
+                    options: { 'modal': "Modal"|t, 'redirect': "Redirect"|t },
+                    value: settings['displayType']
+                }) }}
 
-            {{ forms.textField({
-                label: 'Title of Age Gate',
-                name: 'agegateTitle',
-                value: settings['agegateTitle']
-            }) }}
+                {{ forms.selectField({
+                    label: "Validation Type"|t,
+                    instructions: "Choose how the user verifies their age"|t,
+                    id: 'validationType',
+                    name: 'validationType',
+                    options: { 'simple': "Simple (Yes/No)"|t, 'year_only': "Year Only"|t, 'birthdate': "Birthdate"|t },
+                    value: settings['validationType'] ?? 'simple'
+                }) }}
 
-            {{ forms.textField({
-                label: 'Content of agegate',
-                name: 'agegateContent',
-                value: settings['agegateContent']
-            }) }}
+                {{ forms.selectField({
+                    label: "Input Style"|t,
+                    instructions: "Choose how the validation input is displayed (does not apply to Simple type)"|t,
+                    id: 'validationInputStyle',
+                    name: 'validationInputStyle',
+                    options: { 'single': "Single Field"|t, 'separate': "Separate Fields"|t },
+                    value: settings['validationInputStyle'] ?? 'single'
+                }) }}
 
-            {{ forms.textField({
-                label: 'Agree Button',
-                name: 'agegateAgreeButton',
-                value: settings['agegateAgreeButton']
-            }) }}
+                {{ forms.selectField({
+                    label: "Birthdate Format"|t,
+                    instructions: "Choose the date format (only applies to Birthdate type with Separate Fields)"|t,
+                    id: 'birthdateFormat',
+                    name: 'birthdateFormat',
+                    options: { 
+                        'dmy': "DD-MM-YYYY"|t, 
+                        'mdy': "MM-DD-YYYY"|t, 
+                        'ymd': "YYYY-MM-DD"|t,
+                        'dmy_short': "DD-MM-YY"|t, 
+                        'mdy_short': "MM-DD-YY"|t, 
+                        'ymd_short': "YY-MM-DD"|t 
+                    },
+                    value: settings['birthdateFormat'] ?? 'dmy'
+                }) }}
 
-            {{ forms.textField({
-                label: 'Decline Button',
-                name: 'agegateDeclineButton',
-                value: settings['agegateDeclineButton']
-            }) }}
+                {{ forms.textField({
+                    label: 'Title of Age Gate',
+                    id: 'agegateTitle',
+                    name: 'agegateTitle',
+                    value: settings['agegateTitle']
+                }) }}
 
-            <div class="agegate-settings-entries">
-                <div>
-                    {{ forms.elementSelectField({
-                        elementType: 'craft\\elements\\Entry',
-                        label: 'Select Privacy Policy Page',
-                        name: 'pagePrivacyPolicy',
-                        elements: pagePrivacyPolicy
-                    }) }}
+                {{ forms.textareaField({
+                    label: 'Content of agegate',
+                    id: 'agegateContent',
+                    name: 'agegateContent',
+                    value: settings['agegateContent'],
+                    rows: 4,
+                }) }}
 
-                    {{ forms.elementSelectField({
-                        elementType: 'craft\\elements\\Entry',
-                        label: 'Select Cookie Policy Page',
-                        name: 'pageCookiePolicy',
-                        id: 'pageCookiePolicy',
-                        elements: pageCookiePolicy
-                    }) }}
+                {{ forms.textField({
+                    label: 'Agree Button',
+                    id: 'agegateAgreeButton',
+                    name: 'agegateAgreeButton',
+                    value: settings['agegateAgreeButton'],
+                    instructions: 'Text for the button that allows entry (Modal only)'
+                }) }}
 
-                    {{ forms.elementSelectField({
-                        elementType: 'craft\\elements\\Entry',
-                        label: 'Age Gate Page',
-                        name: 'pageRedirection',
-                        elements: pageRedirected
-                    }) }}
-                </div>
+                {{ forms.textField({
+                    label: 'Decline Button',
+                    id: 'agegateDeclineButton',
+                    name: 'agegateDeclineButton',
+                    value: settings['agegateDeclineButton'],
+                    instructions: 'Text for the button that denies entry (Modal only)'
+                }) }}
+
+                {{ forms.elementSelectField({
+                    elementType: 'craft\\elements\\Entry',
+                    label: 'Age Gate Page',
+                    id: 'pageRedirection',
+                    name: 'pageRedirection',
+                    elements: pageRedirected,
+                    instructions: 'Select the page that will be used as the age gate page (Redirect mode only)'
+                }) }}
+            </div>
+
+            <div id="page-settings" class="hidden">
+                {{ forms.elementSelectField({
+                    elementType: 'craft\\elements\\Entry',
+                    label: 'Excluded Pages',
+                    name: 'excludedFromAgeGate',
+                    elements: excludedFromAgeGate
+                }) }}
+            </div>
+
+            <div id="styling-settings" class="hidden">
+                {{ forms.colorField({
+                    label: 'Primary Color',
+                    name: 'primaryColor',
+                    value: settings['primaryColor'] ?? '#ff6b6b'
+                }) }}
+
+                {{ forms.textField({
+                    label: 'Background Color (rgba)',
+                    name: 'backgroundColor',
+                    value: settings['backgroundColor'] ?? 'rgba(255, 255, 255, 0.25)',
+                    instructions: 'Use rgba for transparency, e.g. rgba(255, 255, 255, 0.25) or rgba(0, 0, 0, 0.8)'
+                }) }}
+
+                {{ forms.textField({
+                    label: 'Background Blur Amount',
+                    name: 'blurAmount',
+                    value: settings['blurAmount'] ?? '16px',
+                    instructions: 'e.g. 10px, 16px'
+                }) }}
+
+                {{ forms.textField({
+                    label: 'Border Radius',
+                    name: 'borderRadius',
+                    value: settings['borderRadius'] ?? '24px',
+                    instructions: 'e.g. 12px, 24px'
+                }) }}
+            </div>
+
+            <div id="privacy-settings" class="hidden">
+                <p>Privacy settings are configured through the Page Settings panel above.</p>
             </div>
         {% endnamespace %}
 
-        <input type="submit" class="submit btn" value="{{ 'Save'|t }}">
+        <div class="buttons" style="margin-top: 24px;">
+            <input type="submit" class="btn submit primary" value="{{ 'Save'|t }}">
+        </div>
     </form>
 {% endset %}
 
 {% js %}
+$(function() {
+    var panelIds = ['#general-settings', '#content-settings', '#page-settings', '#styling-settings', '#privacy-settings'];
+
+    function showTabFromHash() {
+        var hash = window.location.hash || '#general-settings';
+        
+        if (panelIds.includes(hash)) {
+            // Hide all panels by their namespaced IDs
+            $.each(panelIds, function(index, id) {
+                var namespacedId = '#settings-' + id.substring(1); // e.g. #settings-general-settings
+                $(namespacedId).addClass('hidden').hide();
+            });
+            
+            // Show the active panel by its namespaced ID
+            var activeNamespacedId = '#settings-' + hash.substring(1);
+            $(activeNamespacedId).removeClass('hidden').show();
+            
+            // Highlight the correct tab
+            $('a[role="tab"]').removeClass('sel active').attr('aria-selected', 'false');
+            $('a[role="tab"][href="' + hash + '"]').addClass('sel active').attr('aria-selected', 'true');
+        }
+    }
+
+    // Listen for URL hash changes
+    window.addEventListener('hashchange', showTabFromHash);
+    
+    // Explicitly bind to the a[role="tab"] click event!
+    $(document).on('click', 'a[role="tab"]', function(e) {
+        var targetId = $(this).attr('href');
+        if (targetId && targetId.startsWith('#')) {
+            window.location.hash = targetId;
+            showTabFromHash();
+        }
+    });
+
+    // Also try to hook clicks in the capture phase just in case Craft blocks the bubble
+    document.addEventListener('click', function(e) {
+        var link = e.target.closest('a[role="tab"]');
+        if (link && link.getAttribute('href') && link.getAttribute('href').startsWith('#')) {
+            window.location.hash = link.getAttribute('href');
+            showTabFromHash();
+        }
+    }, true);
+
+    // Initial load
+    showTabFromHash();
+
+    // Conditional Fields
+    // The select field ID is also namespaced!
+    var $typeSelect = $('#settings-type');
+    var $valTypeSelect = $('#settings-validationType');
+    
+    function updateContentFields() {
+        if ($typeSelect.length === 0) return;
+        
+        var modalFields = $('#settings-validationType-field, #settings-agegateTitle-field, #settings-agegateContent-field, #settings-agegateAgreeButton-field, #settings-agegateDeclineButton-field');
+        var redirectFields = $('#settings-pageRedirection-field');
+
+        if ($typeSelect.val() === 'modal') {
+            modalFields.removeClass('hidden').show();
+            redirectFields.addClass('hidden').hide();
+        } else {
+            modalFields.addClass('hidden').hide();
+            redirectFields.removeClass('hidden').show();
+        }
+        
+        // Handle Validation Input Style visibility
+        if ($valTypeSelect.val() === 'simple' || $typeSelect.val() !== 'modal') {
+            $('#settings-validationInputStyle-field').addClass('hidden').hide();
+        } else {
+            $('#settings-validationInputStyle-field').removeClass('hidden').show();
+        }
+
+        // Handle Birthdate Format visibility
+        if ($valTypeSelect.val() !== 'birthdate' || $typeSelect.val() !== 'modal') {
+            $('#settings-birthdateFormat-field').addClass('hidden').hide();
+        } else {
+            $('#settings-birthdateFormat-field').removeClass('hidden').show();
+        }
+    }
+    
+    $typeSelect.on('change', updateContentFields);
+    $valTypeSelect.on('change', updateContentFields);
+    updateContentFields();
+});
 {% endjs %}

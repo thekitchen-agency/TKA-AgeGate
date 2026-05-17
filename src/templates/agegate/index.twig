@@ -1,6 +1,6 @@
 {% macro convertToLink(entry) %}
     {% if entry %}
-        <a class="inline-link" href="{{ entry.url }}">{{ entry.title }}</a>
+        <a class="ag-inline-link" href="{{ entry.url }}">{{ entry.title }}</a>
     {%  endif %}
 {% endmacro %}
 
@@ -8,26 +8,262 @@
 {% set agbPage = _self.convertToLink(craft.entries().id(settings.pagePrivacyPolicy|json_decode).one()) %}
 {% set cookiesPage = _self.convertToLink(craft.entries().id(settings.pageCookiePolicy|json_decode).one()) %}
 {% set displayType = settings.displayType %}
+
+<style>
+    :root {
+        --ag-primary: {{ (settings.primaryColor ?? '#ff6b6b') starts with '#' ? (settings.primaryColor ?? '#ff6b6b') : '#' ~ (settings.primaryColor ?? 'ff6b6b') }};
+        --ag-bg: {{ settings.backgroundColor ?? 'rgba(255, 255, 255, 0.25)' }};
+        --ag-blur: {{ settings.blurAmount ?? '16px' }};
+        --ag-radius: {{ settings.borderRadius ?? '24px' }};
+    }
+</style>
+
 {% switch displayType %}
     {% case 'modal' %}
-    <div class="modal" id="agegate" data-type="modal">
-        <div class="wrap">
-            <h3>{{ settings.agegateTitle|replace('[minAge]', minAge) }}</h3>
-            <p>{{ settings.agegateContent | replace('[Cookies]', agbPage) | replace('[Datenschutz]', cookiesPage) | raw }}</p>
-            <a href="#" class="button solid confirm-ag">{{ settings.agegateAgreeButton|replace('[minAge]', minAge) }}</a>
-            <a href="#" class="button outline decline-ag">{{ settings.agegateDeclineButton|replace('[minAge]', minAge) }}</a>
-        </div>
-    </div>
-    <div class="ag-verifyOverlay"></div>
-    {% case 'redirect' or 'component' %}
-    <div class="component" id="agegate" data-type="component">
-        <div class="wrap">
-            <h1>{{ settings.agegateTitle|replace('[minAge]', minAge) }}</h1>
-            <p>{{ settings.agegateContent | replace('[Cookies]', agbPage) | replace('[Datenschutz]', cookiesPage) | raw }}</p>
-            <div class="controls">
-                <a href="#" class="button solid confirm-ag">{{ settings.agegateAgreeButton|replace('[minAge]', minAge) }}</a>
-                <a href="#" class="button outline dark decline-ag">{{ settings.agegateDeclineButton|replace('[minAge]', minAge) }}</a>
+        <div class="modal" id="agegate" data-type="modal">
+            <div class="wrap">
+                <h3>{{ settings.agegateTitle|replace('[minAge]', minAge) }}</h3>
+                <p>{{ settings.agegateContent | replace('[cookie_page]', agbPage) | replace('[privacy_page]', cookiesPage) | raw }}</p>
+                {% set valType = settings.validationType|default('simple') %}
+                <form id="agegate-modal-form">
+                    {% if valType == 'year_only' %}
+                        {% if settings.validationInputStyle == 'separate' %}
+                            <div class="ag-separate-inputs ag-year-inputs" style="display:flex; justify-content:center; gap:10px; margin-bottom: 15px;">
+                                <input type="tel" class="ag-char-input" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 50px; text-align: center; padding: 12px; font-size: 1.2em; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                <input type="tel" class="ag-char-input" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 50px; text-align: center; padding: 12px; font-size: 1.2em; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                <input type="tel" class="ag-char-input" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 50px; text-align: center; padding: 12px; font-size: 1.2em; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                <input type="tel" class="ag-char-input" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 50px; text-align: center; padding: 12px; font-size: 1.2em; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                <input type="hidden" id="ag-year" name="ag-year">
+                            </div>
+                        {% else %}
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <input type="number" id="ag-year" name="ag-year" placeholder="YYYY" min="1900" max="{{ "now"|date("Y") }}" required style="padding: 10px; width: 100%; box-sizing: border-box; text-align: center; font-size: 1.1em; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                            </div>
+                        {% endif %}
+                    {% elseif valType == 'birthdate' %}
+                        {% if settings.validationInputStyle == 'separate' %}
+                            {% set dateFormat = settings.birthdateFormat|default('dmy') %}
+                            {% set isShortYear = dateFormat ends with '_short' %}
+                            {% set baseFormat = dateFormat|replace({'_short': ''}) %}
+                            {% set dInputs %}
+                                <input type="tel" class="ag-char-input ag-d" maxlength="1" pattern="[0-9]*" placeholder="D" required style="width: 40px; text-align: center; padding: 10px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                <input type="tel" class="ag-char-input ag-d" maxlength="1" pattern="[0-9]*" placeholder="D" required style="width: 40px; text-align: center; padding: 10px; margin-right: 8px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                            {% endset %}
+                            {% set mInputs %}
+                                <input type="tel" class="ag-char-input ag-m" maxlength="1" pattern="[0-9]*" placeholder="M" required style="width: 40px; text-align: center; padding: 10px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                <input type="tel" class="ag-char-input ag-m" maxlength="1" pattern="[0-9]*" placeholder="M" required style="width: 40px; text-align: center; padding: 10px; margin-right: 8px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                            {% endset %}
+                            {% set yInputs %}
+                                {% if not isShortYear %}
+                                    <input type="tel" class="ag-char-input ag-y" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 40px; text-align: center; padding: 10px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                    <input type="tel" class="ag-char-input ag-y" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 40px; text-align: center; padding: 10px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                {% endif %}
+                                <input type="tel" class="ag-char-input ag-y" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 40px; text-align: center; padding: 10px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                <input type="tel" class="ag-char-input ag-y" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 40px; text-align: center; padding: 10px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                            {% endset %}
+
+                            <div class="ag-separate-inputs ag-birthdate-inputs" data-format="{{ dateFormat }}" style="display:flex; justify-content:center; gap:6px; margin-bottom: 15px;">
+                                {% if baseFormat == 'mdy' %}
+                                    {{ mInputs }}{{ dInputs }}{{ yInputs }}
+                                {% elseif baseFormat == 'ymd' %}
+                                    {{ yInputs }}{{ mInputs }}{{ dInputs }}
+                                {% else %}
+                                    {{ dInputs }}{{ mInputs }}{{ yInputs }}
+                                {% endif %}
+                                <input type="hidden" id="ag-birthdate" name="ag-birthdate">
+                            </div>
+                        {% else %}
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <input type="date" id="ag-birthdate" name="ag-birthdate" max="{{ "now"|date("Y-m-d") }}" required style="padding: 10px; width: 100%; box-sizing: border-box; text-align: center; font-size: 1.1em; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    <div class="error-message" id="modal-age-error" style="display: none; color: red; margin-bottom: 15px; text-align: center;">
+                        You must be at least {{ minAge }} years old to enter this site.
+                    </div>
+                    <button type="submit" class="button solid confirm-ag" style="cursor: pointer;">{{ settings.agegateAgreeButton|replace('[minAge]', minAge) }}</button>
+                    <a href="{{ settings.declineUrl|default('#') }}" class="button outline decline-ag">{{ settings.agegateDeclineButton|replace('[minAge]', minAge) }}</a>
+                </form>
             </div>
         </div>
-    </div>
+        <div class="ag-verifyOverlay"></div>
+    {% case 'redirect' %}
+        {# Enhanced redirect case with more data and functionality #}
+        {% set ageGateData = craft.ageGate.getAgeGateData() %}
+        {% set originalUrl = craft.ageGate.getOriginalUrl() %}
+        {% set minAge = craft.ageGate.getMinAge() %}
+        
+        {# Check if user is already verified and redirect if so #}
+        {% if craft.ageGate.isAgeVerified() %}
+            <script>
+                if (window.AgeGateHelpers) {
+                    window.AgeGateHelpers.redirectToOriginal();
+                } else {
+                    window.location.href = '{{ originalUrl ?: "/" }}';
+                }
+            </script>
+        {% else %}
+            {# Render custom age gate page with all available data #}
+            <div id="agegate" data-type="redirect" class="agegate-redirect">
+                <div class="agegate-content">
+                    <h1>{{ craft.ageGate.getFormattedTitle() }}</h1>
+                    <div class="agegate-message">
+                        {{ craft.ageGate.getFormattedContent()|raw }}
+                    </div>
+                    
+                    {% set valType = ageGateData.settings.validationType|default('simple') %}
+                    <form id="age-gate-form" class="agegate-form" data-valtype="{{ valType }}">
+                        {% if valType != 'simple' %}
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                {% if valType == 'year_only' %}
+                                    <label for="birthdate" style="display:block; text-align:center; margin-bottom: 10px;">Enter your birth year:</label>
+                                    {% if ageGateData.settings.validationInputStyle == 'separate' %}
+                                        <div class="ag-separate-inputs ag-year-inputs" style="display:flex; justify-content:center; gap:10px;">
+                                            <input type="tel" class="ag-char-input" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 50px; text-align: center; padding: 12px; font-size: 1.2em; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                            <input type="tel" class="ag-char-input" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 50px; text-align: center; padding: 12px; font-size: 1.2em; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                            <input type="tel" class="ag-char-input" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 50px; text-align: center; padding: 12px; font-size: 1.2em; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                            <input type="tel" class="ag-char-input" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 50px; text-align: center; padding: 12px; font-size: 1.2em; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                            <input type="hidden" id="birthdate" name="birthdate">
+                                        </div>
+                                    {% else %}
+                                        <input type="number" id="birthdate" name="birthdate" placeholder="YYYY" required min="1900" max="{{ "now"|date("Y") }}" style="padding: 10px; width: 100%; box-sizing: border-box; text-align: center; font-size: 1.1em; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                    {% endif %}
+                                {% else %}
+                                    <label for="birthdate" style="display:block; text-align:center; margin-bottom: 10px;">Enter your date of birth:</label>
+                                    {% if ageGateData.settings.validationInputStyle == 'separate' %}
+                                        {% set dateFormat = ageGateData.settings.birthdateFormat|default('dmy') %}
+                                        {% set isShortYear = dateFormat ends with '_short' %}
+                                        {% set baseFormat = dateFormat|replace({'_short': ''}) %}
+                                        {% set dInputs %}
+                                            <input type="tel" class="ag-char-input ag-d" maxlength="1" pattern="[0-9]*" placeholder="D" required style="width: 40px; text-align: center; padding: 10px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                            <input type="tel" class="ag-char-input ag-d" maxlength="1" pattern="[0-9]*" placeholder="D" required style="width: 40px; text-align: center; padding: 10px; margin-right: 8px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                        {% endset %}
+                                        {% set mInputs %}
+                                            <input type="tel" class="ag-char-input ag-m" maxlength="1" pattern="[0-9]*" placeholder="M" required style="width: 40px; text-align: center; padding: 10px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                            <input type="tel" class="ag-char-input ag-m" maxlength="1" pattern="[0-9]*" placeholder="M" required style="width: 40px; text-align: center; padding: 10px; margin-right: 8px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                        {% endset %}
+                                        {% set yInputs %}
+                                            {% if not isShortYear %}
+                                                <input type="tel" class="ag-char-input ag-y" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 40px; text-align: center; padding: 10px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                                <input type="tel" class="ag-char-input ag-y" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 40px; text-align: center; padding: 10px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                            {% endif %}
+                                            <input type="tel" class="ag-char-input ag-y" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 40px; text-align: center; padding: 10px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                            <input type="tel" class="ag-char-input ag-y" maxlength="1" pattern="[0-9]*" placeholder="Y" required style="width: 40px; text-align: center; padding: 10px; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                        {% endset %}
+
+                                        <div class="ag-separate-inputs ag-birthdate-inputs" data-format="{{ dateFormat }}" style="display:flex; justify-content:center; gap:6px;">
+                                            {% if baseFormat == 'mdy' %}
+                                                {{ mInputs }}{{ dInputs }}{{ yInputs }}
+                                            {% elseif baseFormat == 'ymd' %}
+                                                {{ yInputs }}{{ mInputs }}{{ dInputs }}
+                                            {% else %}
+                                                {{ dInputs }}{{ mInputs }}{{ yInputs }}
+                                            {% endif %}
+                                            <input type="hidden" id="birthdate" name="birthdate">
+                                        </div>
+                                    {% else %}
+                                        <input type="date" id="birthdate" name="birthdate" required max="{{ "now"|date("Y-m-d") }}" style="padding: 10px; width: 100%; box-sizing: border-box; text-align: center; font-size: 1.1em; border-radius: var(--ag-radius); border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: inherit;">
+                                    {% endif %}
+                                {% endif %}
+                                <div class="error-message" id="age-error" style="display: none; color: red; text-align: center; margin-top: 10px;">
+                                    You must be at least {{ minAge }} years old to enter this site.
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary">
+                                {{ craft.ageGate.getFormattedAgreeButton() }}
+                            </button>
+                            <a href="{{ craft.ageGate.getDeclineUrl() }}" class="btn btn-secondary">
+                                {{ craft.ageGate.getFormattedDeclineButton() }}
+                            </a>
+                        </div>
+                    </form>
+                    
+                    {% if craft.ageGate.getPrivacyPolicyUrl() or craft.ageGate.getCookiePolicyUrl() %}
+                        <div class="agegate-links">
+                            {% if craft.ageGate.getPrivacyPolicyUrl() %}
+                                <a href="{{ craft.ageGate.getPrivacyPolicyUrl() }}">Privacy Policy</a>
+                            {% endif %}
+                            {% if craft.ageGate.getPrivacyPolicyUrl() and craft.ageGate.getCookiePolicyUrl() %}
+                                <span> • </span>
+                            {% endif %}
+                            {% if craft.ageGate.getCookiePolicyUrl() %}
+                                <a href="{{ craft.ageGate.getCookiePolicyUrl() }}">Cookie Policy</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <script>
+                // Make all age gate data available to JavaScript
+                window.ageGateData = {{ ageGateData|json_encode|raw }};
+                window.originalSrcUrl = '{{ originalUrl }}';
+                
+                // Initialize form handling
+                document.addEventListener('DOMContentLoaded', function() {
+                    const form = document.getElementById('age-gate-form');
+                    const birthdateInput = document.getElementById('birthdate');
+                    const errorMessage = document.getElementById('age-error');
+                    
+                    if (form && birthdateInput) {
+                        form.addEventListener('submit', function(e) {
+                            e.preventDefault();
+                            
+                            const valType = form.getAttribute('data-valtype') || 'simple';
+                            let isValid = true;
+                            
+                            if (valType !== 'simple') {
+                                const birthdate = birthdateInput ? birthdateInput.value : null;
+                                if (!birthdate) {
+                                    showError('Please provide your age information.');
+                                    return;
+                                }
+                                
+                                const today = new Date();
+                                let age = 0;
+                                
+                                if (valType === 'year_only') {
+                                    age = today.getFullYear() - parseInt(birthdate, 10);
+                                } else {
+                                    const birth = new Date(birthdate);
+                                    age = today.getFullYear() - birth.getFullYear();
+                                    const monthDiff = today.getMonth() - birth.getMonth();
+                                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                                        age--;
+                                    }
+                                }
+                                
+                                isValid = age >= {{ minAge }};
+                            }
+                            
+                            if (isValid) {
+                                // Set cookie and redirect
+                                const cookieName = '{{ craft.ageGate.getCookieName() }}';
+                                document.cookie = cookieName + '=verified;expires=' + new Date(Date.now() + 365*24*60*60*1000).toUTCString() + ';path=/';
+                                window.location.href = '{{ originalUrl ?: "/" }}';
+                            } else {
+                                showError();
+                            }
+                        });
+                        
+                        if (birthdateInput) {
+                            birthdateInput.addEventListener('input', function() {
+                                errorMessage.style.display = 'none';
+                            });
+                        }
+                    }
+                    
+                    function showError(customMessage) {
+                        errorMessage.style.display = 'block';
+                        if (customMessage) {
+                            errorMessage.textContent = customMessage;
+                        }
+                        birthdateInput.focus();
+                    }
+                });
+            </script>
+        {% endif %}
 {% endswitch %}

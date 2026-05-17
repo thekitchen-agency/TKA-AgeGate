@@ -1,0 +1,250 @@
+{# 
+Example Custom Age Gate Template
+Copy this file to: templates/age-gate/index.twig
+This will override the plugin's default template.
+
+All the same data and helper functions are available as in the plugin template.
+#}
+
+{% set ageGateData = craft.ageGate.getAgeGateData() %}
+{% set originalUrl = craft.ageGate.getOriginalUrl() %}
+{% set minAge = craft.ageGate.getMinAge() %}
+
+<!DOCTYPE html>
+<html lang="{{ craft.app.language }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ craft.ageGate.getFormattedTitle() }}</title>
+    
+    {# Include the plugin's CSS if needed #}
+    <link rel="stylesheet" href="{{ craft.app.assetManager->getPublishedUrl('@thekitchenagency/craftagegate/src/resources/css/AgeGate.css', true) }}">
+    
+    <style>
+        /* Your custom styles here */
+        .custom-age-gate {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .age-gate-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .age-gate-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .age-gate-content {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .age-gate-form {
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #dee2e6;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        
+        .links {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="custom-age-gate">
+        <div class="age-gate-container">
+            <h1 class="age-gate-title">{{ craft.ageGate.getFormattedTitle() }}</h1>
+            
+            <div class="age-gate-content">
+                {{ craft.ageGate.getFormattedContent()|raw }}
+            </div>
+            
+            <form class="age-gate-form" id="age-gate-form">
+                <div class="form-group">
+                    <label for="birthdate" class="form-label">Enter your date of birth:</label>
+                    <input 
+                        type="date" 
+                        id="birthdate" 
+                        name="birthdate" 
+                        class="form-input" 
+                        required
+                        max="{{ "now"|date("Y-m-d") }}"
+                    >
+                    <div class="error-message" id="error-message">
+                        You must be at least {{ minAge }} years old to enter this site.
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
+                        {{ craft.ageGate.getFormattedAgreeButton() }}
+                    </button>
+                    <a href="{{ craft.ageGate.getDeclineUrl() }}" class="btn btn-secondary">
+                        {{ craft.ageGate.getFormattedDeclineButton() }}
+                    </a>
+                </div>
+            </form>
+            
+            {% if craft.ageGate.getPrivacyPolicyUrl() or craft.ageGate.getCookiePolicyUrl() %}
+                <div class="links">
+                    {% if craft.ageGate.getPrivacyPolicyUrl() %}
+                        <a href="{{ craft.ageGate.getPrivacyPolicyUrl() }}">Privacy Policy</a>
+                    {% endif %}
+                    {% if craft.ageGate.getPrivacyPolicyUrl() and craft.ageGate.getCookiePolicyUrl() %}
+                        <span> • </span>
+                    {% endif %}
+                    {% if craft.ageGate.getCookiePolicyUrl() %}
+                        <a href="{{ craft.ageGate.getCookiePolicyUrl() }}">Cookie Policy</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Include the plugin's JavaScript #}
+    <script src="{{ craft.app.assetManager->getPublishedUrl('@thekitchenagency/craftagegate/src/resources/js/AgeGate.js', true) }}"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if age is already verified
+            if (window.AgeGateHelpers && window.AgeGateHelpers.isAgeVerified()) {
+                window.AgeGateHelpers.redirectToOriginal();
+                return;
+            }
+            
+            // Initialize the form
+            const form = document.getElementById('age-gate-form');
+            const birthdateInput = document.getElementById('birthdate');
+            const errorMessage = document.getElementById('error-message');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const birthdate = birthdateInput.value;
+                if (!birthdate) {
+                    showError('Please enter your date of birth.');
+                    return;
+                }
+                
+                // Use the helper function to verify age
+                if (window.AgeGateHelpers && window.AgeGateHelpers.verifyAge(birthdate)) {
+                    window.AgeGateHelpers.verifyAndRedirect();
+                } else {
+                    showError();
+                }
+            });
+            
+            function showError(customMessage) {
+                errorMessage.style.display = 'block';
+                if (customMessage) {
+                    errorMessage.textContent = customMessage;
+                }
+                birthdateInput.focus();
+            }
+            
+            // Hide error when user starts typing
+            birthdateInput.addEventListener('input', function() {
+                errorMessage.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
+

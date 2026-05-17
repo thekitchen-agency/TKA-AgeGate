@@ -1,18 +1,7 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg fill="#000000" height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-	 viewBox="0 0 490 490" xml:space="preserve">
-<g>
-	<g>
-		<g>
-			<path d="M385,0H105c-5.522,0-10,4.477-10,10v470c0,5.523,4.478,10,10,10h280c5.522,0,10-4.477,10-10V10
-				C395,4.477,390.522,0,385,0z M375,470H115V20h260V470z"/>
-			<path d="M140,240h210c5.522,0,10-4.477,10-10V55c0-11.028-8.972-20-20-20H150c-11.028,0-20,8.972-20,20v175
-				C130,235.523,134.478,240,140,240z M255,55h85v75h-85V55z M255,150h85v70h-85V150z M150,55h85v75h-85V55z M150,150h85v70h-85V150
-				z"/>
-			<path d="M325,280c-16.542,0-30,13.458-30,30s13.458,30,30,30s30-13.458,30-30S341.542,280,325,280z M325,320
-				c-5.514,0-10-4.486-10-10c0-5.514,4.486-10,10-10c5.514,0,10,4.486,10,10C335,315.514,330.514,320,325,320z"/>
-		</g>
-	</g>
-</g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <rect width="100" height="100" rx="20" fill="#ff6b6b"/>
+  <path d="M30 80 V30 C30 25 35 20 40 20 H60 C65 20 70 25 70 30 V80 Z" fill="#ffffff"/>
+  <rect x="25" y="80" width="50" height="5" fill="#333333"/>
+  <circle cx="50" cy="50" r="18" fill="#333333"/>
+  <text x="50" y="55" font-family="Arial, sans-serif" font-weight="bold" font-size="14" fill="#ffffff" text-anchor="middle">18+</text>
 </svg>

@@ -1,19 +1,19 @@
 {
-  "name": "thekitchen-agency/craft-agegate",
+  "name": "thekitchen-agency/craft-age-gate",
   "description": "Use a full featured agegate to protect your site from under-aged visitors.",
   "type": "craft-plugin",
   "keywords": [
     "craft",
     "craftcms",
-    "craftcms4",
+    "craftcms5",
     "craft-plugin",
-    "craft-agegate"
+    "craft-age-gate"
   ],
   "support": {
     "issues": "https://github.com/thekitchen-agency/TKA-AgeGate/issues",
     "docs": "https://github.com/thekitchen-agency/TKA-AgeGate/wiki"
   },
-  "license": "proprietary",
+  "license": "craft",
   "authors": [
     {
       "name": "TheKitchen Agency",
@@ -22,10 +22,13 @@
     }
   ],
   "require": {
-    "php": ">=8.0.2",
-    "craftcms/cms": "^4.3.10",
-    "nystudio107/craft-plugin-vite": "^4.0",
+    "php": "8.2",
+    "craftcms/cms": "^5.8.0",
     "jaybizzle/crawler-detect": "^1.2"
+  },
+  "require-dev": {
+    "craftcms/ecs": "dev-main",
+    "craftcms/phpstan": "dev-main"
   },
   "autoload": {
     "psr-4": {
@@ -33,15 +36,24 @@
     }
   },
   "extra": {
-    "name": "Agegate",
-    "handle": "craft-agegate",
+    "name": "AgeGate",
+    "handle": "craft-age-gate",
     "changelogUrl": "https://github.com/thekitchen-agency/TKA-AgeGate/blob/main/CHANGELOG.md",
     "class": "thekitchenagency\\craftagegate\\AgeGate",
     "components": {
       "agegateService": "thekitchenagency\\craftagegate\\services\\AgeGateService"
     }
   },
+  "scripts": {
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --ansi --fix",
+    "phpstan": "phpstan --memory-limit=1G"
+  },
   "config": {
+    "sort-packages": true,
+    "platform": {
+      "php": "8.2"
+    },
     "allow-plugins": {
       "yiisoft/yii2-composer": true,
       "craftcms/plugin-installer": true

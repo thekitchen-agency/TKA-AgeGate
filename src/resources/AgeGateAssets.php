@@ -7,18 +7,18 @@ use craft\web\assets\cp\CpAsset;
 
 class AgeGateAssets extends AssetBundle
 {
-	public function init()
-	{
-		$this->sourcePath = '@thekitchenagency/craftagegate/resources/';
+    public function init()
+    {
+        $this->sourcePath = '@thekitchenagency/craftagegate/resources/';
 
-		$this->js = [
-			'js/AgeGate.js',
-		];
+        $this->js = [
+            'js/AgeGate.js',
+        ];
 
-		$this->css = [
-			'css/AgeGate.css',
-		];
+        $this->css = [
+            'css/AgeGate.css',
+        ];
 
-		parent::init();
-	}
+        parent::init();
+    }
 }
