@@ -22,7 +22,7 @@
     }
   ],
   "require": {
-    "php": "8.2",
+    "php": "^8.2",
     "craftcms/cms": "^5.8.0",
     "jaybizzle/crawler-detect": "^1.2"
   },
@@ -52,7 +52,7 @@
   "config": {
     "sort-packages": true,
     "platform": {
-      "php": "8.2"
+      "php": "^8.2"
     },
     "allow-plugins": {
       "yiisoft/yii2-composer": true,

@@ -47,7 +47,7 @@ class AgeGate extends Plugin
     // Public Properties
     // =========================================================================
 
-    public string $schemaVersion = '1.0.5';
+    public string $schemaVersion = '1.0.6';
     public bool $hasCpSettings = true;
     public bool $hasCpSection = false;
 
@@ -69,12 +69,6 @@ class AgeGate extends Plugin
             return;
         }
 
-        $crawlerDetect = new CrawlerDetect();
-
-        if ($crawlerDetect->isCrawler()) {
-            return;
-        }
-
         parent::init();
         self::$plugin = $this;
 
@@ -85,7 +79,10 @@ class AgeGate extends Plugin
             self::$settings = new \thekitchenagency\craftagegate\models\Settings();
         }
 
-        if (Craft::$app->getRequest()->getIsSiteRequest()) {
+        $crawlerDetect = new CrawlerDetect();
+        $isCrawler = $crawlerDetect->isCrawler();
+
+        if (Craft::$app->getRequest()->getIsSiteRequest() && !$isCrawler) {
             Craft::$app->getView()->registerAssetBundle(AgeGateAssets::class);
             try {
                 // Register basic settings
@@ -106,7 +103,10 @@ class AgeGate extends Plugin
         
         $this->attachEventHandlers();
 
-        Craft::$app->onInit(function () {
+        Craft::$app->onInit(function () use ($isCrawler) {
+            if ($isCrawler) {
+                return;
+            }
             if (self::$settings && self::$settings->isAgeGateEnabled && self::$settings->displayType === 'modal') {
                 if (Craft::$app->request->getIsSiteRequest()) {
                     if (!isset($_COOKIE[self::$settings->cookieName]) && empty($_COOKIE[self::$settings->cookieName])) {
